@@ -10,8 +10,8 @@ import os
 import csv
 from zipfile import ZipFile
 
-datafile = "/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Source_Data/2013_ERCOT_Hourly_Load_Data"
-outfile = "/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson1_Intro/PS1_Intro/2013_Max_Loads.csv"
+datafile = "/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L1_Intro/2013_ERCOT_Hourly_Load_Data.xls"
+outfile = "/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L1_Intro/2013_Max_Loads.csv"
 
 
 def open_zip(datafile):

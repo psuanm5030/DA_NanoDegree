@@ -18,7 +18,7 @@ import codecs
 import csv
 import pprint
 
-CITIES = '/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson3_AuditData/PS3_AuditingData/cities.csv'
+CITIES = '/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L3_AuditData/C2PS3_AuditingData/cities.csv'
 
 
 def fix_name(name):

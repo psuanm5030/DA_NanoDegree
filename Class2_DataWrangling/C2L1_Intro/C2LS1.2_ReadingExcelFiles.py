@@ -13,7 +13,7 @@ Please see the test function for the expected return format
 
 import xlrd, pprint
 from zipfile import ZipFile
-datafile = "/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Source_Data/2013_ERCOT_Hourly_Load_Data"
+datafile = "/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/Source_Data/2013_ERCOT_Hourly_Load_Data.xls"
 
 def open_zip(datafile):
     with ZipFile('{0}.zip'.format(datafile), 'r') as myzip:

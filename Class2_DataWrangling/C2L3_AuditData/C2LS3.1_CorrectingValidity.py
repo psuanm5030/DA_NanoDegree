@@ -21,9 +21,9 @@ You can write helper functions for checking the data and writing the files, but 
 import csv
 import pprint
 
-INPUT_FILE = '/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson3_AuditData/autos.csv'
-OUTPUT_GOOD = '/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson3_AuditData/autos-valid.csv'
-OUTPUT_BAD = '/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson3_AuditData/FIXME-autos.csv'
+INPUT_FILE = '/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L3_AuditData/autos.csv'
+OUTPUT_GOOD = '/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L3_AuditData/autos-valid.csv'
+OUTPUT_BAD = '/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L3_AuditData/FIXME-autos.csv'
 
 def process_file(input_file, output_good, output_bad):
 

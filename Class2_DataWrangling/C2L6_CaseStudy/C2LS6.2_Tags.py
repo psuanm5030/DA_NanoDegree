@@ -67,7 +67,7 @@ def test():
     # Note that the assertion below will be incorrect then.
     # Note as well that the test function here is only used in the Test Run;
     # when you submit, your code will be checked against a different dataset.
-    keys = process_map('/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson6_CaseStudy/example.osm')
+    keys = process_map('/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L6_CaseStudy/example.osm')
     pprint.pprint(keys)
     assert keys == {'lower': 5, 'lower_colon': 0, 'other': 1, 'problemchars': 1}
 

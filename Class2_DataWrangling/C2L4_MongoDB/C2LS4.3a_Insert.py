@@ -59,5 +59,5 @@ if __name__ == "__main__":
     client = MongoClient("mongodb://localhost:27017")
     db = client.examples
 
-    insert_autos('/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson4_MongoDB/autos.csv', db)
+    insert_autos('/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L4_MongoDB/autos.csv', db)
     print db.autos.find_one()

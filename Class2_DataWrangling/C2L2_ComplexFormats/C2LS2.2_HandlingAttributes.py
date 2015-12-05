@@ -9,7 +9,7 @@ __author__ = 'Miller'
 # and add them to the list for the dictionary key "insr"
 import xml.etree.ElementTree as ET
 
-article_file = "/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson2_ComplexFormats/exampleResearchArticle.xml"
+article_file = "/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L2_ComplexFormats/exampleResearchArticle.xml"
 
 
 def get_root(fname):

@@ -94,7 +94,7 @@ def test():
     data = []
     for f in files:
         data += process_file(f)
-    datadir = '/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson2_ComplexFormats/PS2_Complex/data/FL-ATL.html'
+    datadir = '/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L2_ComplexFormats/C2PS2_Complex/data/FL-ATL.html'
     assert len(data) == 399  # Total number of rows
     for entry in data[:3]:
         assert type(entry["year"]) == int

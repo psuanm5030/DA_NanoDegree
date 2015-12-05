@@ -3,7 +3,7 @@ __author__ = 'Miller'
 import os, pprint, csv
 
 DATADIR = ""
-DATAFILE = "/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Source_Data/beatles-diskography.csv"
+DATAFILE = "/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/Source_Data/beatles-diskography.csv"
 
 def parse_csv(datafile):
     data = []

@@ -11,7 +11,7 @@ __author__ = 'Miller'
 # You should return a list of codes for the carriers.
 
 from bs4 import BeautifulSoup
-html_page = "/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson2_ComplexFormats/PS2_Complex/options.html"
+html_page = "/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L2_ComplexFormats/C2PS2_Complex/options.html"
 
 
 def extract_carriers(page):

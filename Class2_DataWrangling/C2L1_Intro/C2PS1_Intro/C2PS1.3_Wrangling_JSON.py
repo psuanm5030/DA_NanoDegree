@@ -30,7 +30,7 @@ API_KEY = { "popular": "9dfbbf20f0d8b732662a29abbfc5b16c:12:73178495",
 
 
 def get_from_file(kind, period):
-    filename = "/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson1_Intro/PS1_Intro/popular-{0}-{1}.json".format(kind, period)
+    filename = "/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L1_Intro/C2PS1_Intro/popular-{0}-{1}.json".format(kind, period)
     with open(filename, "r") as f:
         return json.loads(f.read())
 

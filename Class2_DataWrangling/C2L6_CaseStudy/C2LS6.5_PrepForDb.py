@@ -171,7 +171,7 @@ def test():
     # NOTE: if you are running this code on your computer, with a larger dataset,
     # call the process_map procedure with pretty=False. The pretty=True option adds
     # additional spaces to the output, making it significantly larger.
-    data = process_map('example.osm', True)
+    data = process_map('/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L6_CaseStudy/example.osm', True)
     #pprint.pprint(data)
 
     correct_first_elem = {

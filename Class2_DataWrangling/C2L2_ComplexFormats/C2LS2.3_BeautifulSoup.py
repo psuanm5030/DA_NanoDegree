@@ -13,7 +13,7 @@ import requests
 import pprint
 import json
 
-html_page = "/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson2_ComplexFormats/page_source.html"
+html_page = "/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L2_ComplexFormats/page_source.html"
 
 # region Solution
 def extract_data(page):

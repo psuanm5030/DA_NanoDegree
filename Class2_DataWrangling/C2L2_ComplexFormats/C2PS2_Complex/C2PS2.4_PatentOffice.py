@@ -13,7 +13,7 @@ __author__ = 'Miller'
 
 import xml.etree.ElementTree as ET
 
-PATENTS = '/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson2_ComplexFormats/PS2_Complex/data/patent.data'
+PATENTS = '/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L2_ComplexFormats/C2PS2_Complex/data/patent.data'
 
 def get_root(fname):
 

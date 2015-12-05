@@ -138,6 +138,6 @@ def points(series_passed):
     return points
 
     
-(dict123, mpts) = custom_heuristic("/Users/Miller/GitHub/NanoDegree/Class_Intro_to_DataScience/Lesson1/PS1 - Titanic/titanic_data.csv")
+(dict123, mpts) = custom_heuristic("/Users/Miller/GitHub/DAnanodegree/Class1_Intro_to_DataScience/C1L1_Intro/C1PS1_Titanic/titanic_data.csv")
 print mpts
 

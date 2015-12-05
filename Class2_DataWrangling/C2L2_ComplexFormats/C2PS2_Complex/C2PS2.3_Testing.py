@@ -2,7 +2,7 @@ __author__ = 'Miller'
 
 from bs4 import BeautifulSoup
 
-datadir = '/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson2_ComplexFormats/PS2_Complex/data/FL-ATL.html'
+datadir = '/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L2_ComplexFormats/C2PS2_Complex/data/FL-ATL.html'
 
 data = []
 

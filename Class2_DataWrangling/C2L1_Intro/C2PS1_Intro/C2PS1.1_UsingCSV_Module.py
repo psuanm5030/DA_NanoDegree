@@ -17,7 +17,7 @@ You should only change the parse_file function.
 import csv
 import os
 
-DATADIR = "/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson1_Intro/PS1_Intro/"
+DATADIR = "/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L1_Intro/C2PS1_Intro/"
 DATAFILE = "745090.csv"
 
 # Andy's Second try - using the next() function:

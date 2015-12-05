@@ -16,7 +16,7 @@ from collections import defaultdict
 import re
 import pprint
 
-OSMFILE = "example.osm"
+OSMFILE = "/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L6_CaseStudy/example.osm"
 street_type_re = re.compile(r'\b\S+\.?$', re.IGNORECASE)
 
 

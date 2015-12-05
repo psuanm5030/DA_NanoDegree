@@ -29,7 +29,7 @@ import csv
 import json
 import pprint
 
-CITIES = '/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson3_AuditData/PS3_AuditingData/cities.csv'
+CITIES = '/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L3_AuditData/C2PS3_AuditingData/cities.csv'
 
 FIELDS = ["name", "timeZone_label", "utcOffset", "homepage", "governmentType_label", "isPartOf_label", "areaCode", "populationTotal",
           "elevation", "maximumElevation", "minimumElevation", "populationDensity", "wgs84_pos#lat", "wgs84_pos#long",

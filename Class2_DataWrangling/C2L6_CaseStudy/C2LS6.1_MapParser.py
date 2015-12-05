@@ -22,7 +22,7 @@ def count_tags(filename):
 
 def test():
 
-    tags = count_tags('/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson6_CaseStudy/example.osm')
+    tags = count_tags('/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L6_CaseStudy/example.osm')
     pprint.pprint(tags)
     assert tags == {'bounds': 1,
                      'member': 3,

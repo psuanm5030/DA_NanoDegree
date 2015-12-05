@@ -31,7 +31,7 @@ def process_map(filename):
 
 def test():
 
-    users = process_map('/Users/Miller/GitHub/GhNanoDegree/Class_DataWrangling/Lesson6_CaseStudy/example.osm')
+    users = process_map('/Users/Miller/GitHub/DAnanodegree/Class2_DataWrangling/C2L6_CaseStudy/example.osm')
     pprint.pprint(users)
     assert len(users) == 6
 
