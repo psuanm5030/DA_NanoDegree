@@ -11,7 +11,7 @@ import codecs
 import json
 
 # region Static Values Area
-OSMFILE = "/Users/Miller/GitHub/GhNanoDegree/Projects/P3_Data_Wrangling_OpenStreetMap/source/pittsburgh_pennsylvania.osm"
+OSMFILE = "/Users/Miller/GitHub/DAnanodegree/Non_GIT_Files/pittsburgh_pennsylvania.osm"
 lower = re.compile(r'^([a-z]|_)*$')
 lower_colon = re.compile(r'^([a-z]|_)*:([a-z]|_)*$')
 problemchars = re.compile(r'[=\+/&<>;\'"\?%#$@\,\. \t\r\n]')

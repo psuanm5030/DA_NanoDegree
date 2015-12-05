@@ -15,7 +15,7 @@ import codecs
 import json
 
 # Static Values Area
-OSMFILE = "/Users/Miller/GitHub/GhNanoDegree/Projects/P3_Data_Wrangling_OpenStreetMap/source/pittsburgh_pennsylvania.osm"
+OSMFILE = "/Users/Miller/GitHub/DAnanodegree/Non_GIT_Files/pittsburgh_pennsylvania.osm"
 lower = re.compile(r'^([a-z]|_)*$')
 lower_colon = re.compile(r'^([a-z]|_)*:([a-z]|_)*$')
 problemchars = re.compile(r'[=\+/&<>;\'"\?%#$@\,\. \t\r\n]')
@@ -152,7 +152,7 @@ def auditOSMTagsTypes():
     ser = pd.Series(d)
     ser.sort(ascending = False,inplace = True)
     # Create a CSV File
-    ser.to_csv('/Users/Miller/GitHub/GhNanoDegree/Projects/P3_Data_Wrangling_OpenStreetMap/extracted_files/TagTypes.csv',sep='|')
+    ser.to_csv('/Users/Miller/GitHub/DAnanodegree/Projects/P3_Data_Wrangling_OpenStreetMap/extracted_files/TagTypes.csv',sep='|')
     return ser
 
 def auditOSMProblemChars():
@@ -239,7 +239,7 @@ def auditOSMPostalCodes():
     # Create a series that is sorted
     ser = pd.Series(postals)
     ser.sort(ascending = False,inplace = True)
-    ser.to_csv('/Users/Miller/GitHub/GhNanoDegree/Projects/P3_Data_Wrangling_OpenStreetMap/extracted_files/Postals.csv',sep='|')
+    ser.to_csv('/Users/Miller/GitHub/DAnanodegree/Projects/P3_Data_Wrangling_OpenStreetMap/extracted_files/Postals.csv',sep='|')
     return ser
 
 if __name__ == "__main__":
