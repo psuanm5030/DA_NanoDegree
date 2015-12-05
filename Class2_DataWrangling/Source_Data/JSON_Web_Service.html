@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Development / JSON Web Service - MusicBrainz</title><link rel="canonical" href="https://musicbrainz.org/doc/Development/JSON_Web_Service" /><link rel="stylesheet" type="text/css" href="http://musicbrainz.org/static/build/common-53c930fd.css" />
+    
+    <link rel="search" type="application/opensearchdescription+xml" title="MusicBrainz: Artist" href="http://musicbrainz.org/static/search_plugins/opensearch/musicbrainz_artist.xml" />
+    <link rel="search" type="application/opensearchdescription+xml" title="MusicBrainz: Label" href="http://musicbrainz.org/static/search_plugins/opensearch/musicbrainz_label.xml" />
+    <link rel="search" type="application/opensearchdescription+xml" title="MusicBrainz: Release" href="http://musicbrainz.org/static/search_plugins/opensearch/musicbrainz_release.xml" />
+    <link rel="search" type="application/opensearchdescription+xml" title="MusicBrainz: Track" href="http://musicbrainz.org/static/search_plugins/opensearch/musicbrainz_track.xml" />
+    <noscript>
+        <style type="text/css">
+          #header-menu li:hover ul { left: auto; }
+        </style>
+    </noscript><script src="http://musicbrainz.org/static/build/jed-en-7f20d18c.js"></script><script src="http://musicbrainz.org/static/build/common-f9a715f4.js"></script>      <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-30883270-1']);
+        _gaq.push(['_setCustomVar', 1, 'User is logged in', 'No', 2]);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      </script></head>
+    <body><div id="header">
+            <div id="header-logo">
+                <a href="/" class="logo" title="MusicBrainz"><strong>MusicBrainz</strong></a>
+                <div>
+                    <form action="http://musicbrainz.org/search" method="get">
+                        <input class="" id="headerid-query" name="query" placeholder="search" required="required" type="text" value="" />
+                        <select id="headerid-type" name="type"><option value="artist">Artist</option><option value="release_group">Release Group</option><option value="release">Release</option><option value="recording">Recording</option><option value="work">Work</option><option value="label">Label</option><option value="area">Area</option><option value="place">Place</option><option value="annotation">Annotation</option><option value="cdstub">CD Stub</option><option value="editor">Editor</option><option value="freedb">FreeDB</option><option value="tag">Tag</option><option value="instrument">Instrument</option><option value="series">Series</option><option value="event">Event</option><option value="doc">Documentation</option></select>
+                        <input class="" id="headerid-method" name="method" type="hidden" value="indexed" />
+                        <span class="buttons inline"><button type="submit">Search</button></span>
+                    </form>
+                </div>
+            </div>
+            <div id="header-menu">
+                <div><ul class="r">
+            <li><a href="http://musicbrainz.org/login?uri=%2Fdoc%2FDevelopment%2FJSON_Web_Service">Log In</a></li>
+        <li><a href="http://musicbrainz.org/register?uri=%2Fdoc%2FDevelopment%2FJSON_Web_Service">Create Account</a></li></ul>
+
+<ul>
+    <li class="about">
+        <a href="http://musicbrainz.org/doc/About">About</a>
+        <ul>
+            <li>
+                <a href="https://metabrainz.org/sponsors">Sponsors</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/About/Team">Team</a>
+            </li>
+            <li class="separator">
+                <a href="http://musicbrainz.org/doc/About/Data_License">Data Licenses</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/Social_Contract">Social Contract</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/Code_of_Conduct">Code of Conduct</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/About/Privacy_Policy">Privacy Policy</a>
+            </li>
+            <li class="separator">
+                <a href="http://musicbrainz.org/elections">Auto-editor Elections</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/privileged">Privileged User Accounts</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/statistics">Statistics</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/statistics/timeline">Timeline Graph</a>
+            </li>
+        </ul>
+    </li>
+    <li class="blog">
+        <a href="http://blog.musicbrainz.org" class="internal">
+            Blog
+        </a>
+    </li>
+
+    <li class="products">
+        <a href="http://musicbrainz.org/doc/Products">Products</a>
+        <ul>
+            <li>
+                <a href="//picard.musicbrainz.org">MusicBrainz Picard</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/Magic_MP3_Tagger">Magic MP3 Tagger</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/Yate_Music_Tagger">Yate Music Tagger</a>
+            </li>
+            <li class="separator">
+                <a href="http://musicbrainz.org/doc/MusicBrainz_for_Android">MusicBrainz for Android</a>
+            </li>
+            <li class="separator">
+                <a href="http://musicbrainz.org/doc/MusicBrainz_Server">MusicBrainz Server</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/MusicBrainz_Database">MusicBrainz Database</a>
+            </li>
+            <li class="separator">
+                <a href="http://musicbrainz.org/doc/Developer_Resources">Developer Resources</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/XML_Web_Service">XML Web Service</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/Live_Data_Feed">Live Data Feed</a>
+            </li>
+            <li class="separator">
+                <a href="http://musicbrainz.org/doc/FreeDB_Gateway">FreeDB Gateway</a>
+            </li>
+        </ul>
+    </li>
+    <li class="search">
+        <a href="http://musicbrainz.org/search">Search</a>
+        <ul>
+            <li>
+                <a href="http://musicbrainz.org/tags">Tags</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/cdstub/browse">Top CD Stubs</a>
+            </li>
+        </ul>
+    </li>    <li class="documentation">
+        <a href="http://musicbrainz.org/doc/MusicBrainz_Documentation">Documentation</a>
+        <ul>
+            <li>
+                <a href="http://musicbrainz.org/doc/Beginners_Guide">Beginners Guide</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/Style">Style Guidelines</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/How_To">How Tos</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/Frequently_Asked_Questions">FAQs</a>
+            </li>
+            <li class="separator">
+                <a href="http://musicbrainz.org/doc/Edit_Types">Edit Types</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/relationships">Relationship Types</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/instruments">Instrument List</a>
+            </li>
+            <li class="separator">
+                <a href="http://musicbrainz.org/doc/Development">Development</a>
+            </li>
+        </ul>
+    </li>
+    <li class="contact">
+        <a href="http://musicbrainz.org/doc/Contact_Us">Contact Us</a>
+        <ul>
+            <li>
+                <a href="http://musicbrainz.org/doc/Communication/Mailing_Lists">Mailing Lists</a>
+            </li>
+            <li>
+                <a href="http://forums.musicbrainz.org" class="internal">
+                    Forums
+                </a>
+            </li>
+            <li class="separator">
+                <a href="http://tickets.musicbrainz.org" class="internal">
+                    Report a Bug
+                </a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/Copyright_Violation_Notice">Report a Copyright Violation</a>
+            </li>
+            <li>
+                <a href="http://musicbrainz.org/doc/Data_Removal_Policy">Data Removal Policy</a>
+            </li>
+        </ul>
+    </li>
+</ul>
+                </div>
+            </div>
+        </div>
+                        <div class="banner alert">
+                <p>There will be a short downtime on wiki.musicbrainz.org at 7:10 PDT (2:10 UTC) for system updates.</p>
+                <button type="button" class="dismiss-banner remove-item icon" data-banner-name="alert"></button>
+            </div>
+        
+
+        
+
+        <div id="page" class="fullwidth">    <div id="content" class="wikicontent">  <div class="wikidoc-search">
+    <form action="http://musicbrainz.org/search" method="get">
+      <input type="hidden" name="type" value="doc" />
+      <input type="text" name="query" placeholder="Search the documentation..." />
+      <span class="buttons inline"><button type="submit">Search</button></span>
+    </form>
+  </div>
+        <h1 class="hierarchy-links">                                
+
+                <a href="http://musicbrainz.org/doc/Development" >Development</a>
+                 / 
+                            
+                    
+                
+
+                <a href="http://musicbrainz.org/doc/Development/JSON_Web_Service"  style="font-weight:bold;">JSON Web Service</a>
+                
+            
+        </h1>
+            <div class="wikidocs-header">This page has not been reviewed by our documentation team (<a href="http://musicbrainz.org/doc/WikiDocs">more info</a>).            </div><html><head></head><body><p>The main web service is the <a href="/doc/Development/XML_Web_Service/Version_2">XML Web Service</a>. This page is about the (beta) <b>JSON</b> format of that web service. <p>This document describes the proposed JSON output, using example queries and the responses I am proposing. To get a JSON response you can either set the Accept header to &quot;application/json&quot; or add fmt=json to the query string (if both are set, fmt= takes precedence). <p>Some notable differences compared to the JSON response currently used internally by the search server: <ol><li> all &quot;-list&quot; elements are replaced with javascript arrays, using an english plural as the key. So { &quot;tag-list&quot;: { &quot;tag&quot;: [ ... ] } } becomes { &quot;tags&quot;: [ ... ] }. <li> the &quot;name-credit&quot; key inside an &quot;artist-credit&quot; is removed. </ol><p>Some of the responses below have some fields omitted to keep the examples shorter, in the actual webservice obviously this data will be included. <table class="toc" id="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div><ul><li class="toclevel-1 tocsection-1"><a href="#Beta"><span class="tocnumber">1</span> <span class="toctext">Beta</span></a><li class="toclevel-1 tocsection-2"><a href="#Lookup_requests"><span class="tocnumber">2</span> <span class="toctext">Lookup requests</span></a><ul><li class="toclevel-2 tocsection-3"><a href="#Artist"><span class="tocnumber">2.1</span> <span class="toctext">Artist</span></a><li class="toclevel-2 tocsection-4"><a href="#Label"><span class="tocnumber">2.2</span> <span class="toctext">Label</span></a><li class="toclevel-2 tocsection-5"><a href="#Recording"><span class="tocnumber">2.3</span> <span class="toctext">Recording</span></a><li class="toclevel-2 tocsection-6"><a href="#Release"><span class="tocnumber">2.4</span> <span class="toctext">Release</span></a><li class="toclevel-2 tocsection-7"><a href="#Release_Group"><span class="tocnumber">2.5</span> <span class="toctext">Release Group</span></a><li class="toclevel-2 tocsection-8"><a href="#Work"><span class="tocnumber">2.6</span> <span class="toctext">Work</span></a></ul><li class="toclevel-1 tocsection-9"><a href="#Browse_Requests"><span class="tocnumber">3</span> <span class="toctext">Browse Requests</span></a><li class="toclevel-1 tocsection-10"><a href="#Relationships"><span class="tocnumber">4</span> <span class="toctext">Relationships</span></a></ul></td></tr></table><h2><span class="mw-headline" id="Beta">Beta</span></h2><p>WARNING: This web service is available on the production server (musicbrainz.org/ws/2/), but should be not be considered stable. There are still some <a class="external text" href="http://tickets.musicbrainz.org/browse/MBS-3072" rel="nofollow">known bugs</a>, and we may decide to make some small changes to the API as documented below. If you have any feedback comment on the <a class="external text" href="http://tickets.musicbrainz.org/browse/MBS-3072" rel="nofollow">ticket</a> or contact warp through e-mail or irc. When we mark the API as stable we will be very reluctant to make any changes, so now is the time if you have any feedback or suggestions. <h2><span class="mw-headline" id="Lookup_requests">Lookup requests</span></h2><h3><span class="mw-headline" id="Artist">Artist</span></h3><p>Request: <a class="external free" href="http://musicbrainz.org/ws/2/artist/5b11f4ce-a62d-471e-81fc-a69a8278c7da?inc=aliases&amp;fmt=json" rel="nofollow">http://musicbrainz.org/ws/2/artist/5b11f4ce-a62d-471e-81fc-a69a8278c7da?inc=aliases&amp;fmt=json</a><br /> Response: <p><code> </code><pre>{
+    &quot;id&quot;: &quot;5b11f4ce-a62d-471e-81fc-a69a8278c7da&quot;,
+    &quot;name&quot;: &quot;Nirvana&quot;,
+    &quot;sort-name&quot;: &quot;Nirvana&quot;
+    &quot;type&quot;: &quot;Group&quot;,
+    &quot;country&quot;: &quot;US&quot;,
+    &quot;disambiguation&quot;: &quot;90s US grunge band&quot;,
+    &quot;life-span&quot;: {
+        &quot;ended&quot;: true,
+        &quot;begin&quot;: &quot;1988-02&quot;,
+        &quot;end&quot;: &quot;1994-04-05&quot;
+    },
+    &quot;aliases&quot;: [ { &quot;name&quot;: &quot;Nirvana US&quot;, &quot;sort-name&quot;: &quot;Nirvana US&quot; } ]]
+}
+</pre><p><p>Request: <a class="external free" href="http://musicbrainz.org/ws/2/artist/05cbaf37-6dc2-4f71-a0ce-d633447d90c3?inc=aliases+tags+ratings&amp;fmt=json" rel="nofollow">http://musicbrainz.org/ws/2/artist/05cbaf37-6dc2-4f71-a0ce-d633447d90c3?inc=aliases+tags+ratings&amp;fmt=json</a><br /> Response: <p><code> </code><pre>{
+    &quot;id&quot;: &quot;05cbaf37-6dc2-4f71-a0ce-d633447d90c3&quot;,
+    &quot;name&quot;: &quot;&#x6771;&#x65B9;&#x795E;&#x8D77;&quot;,
+    &quot;sort-name&quot;: &quot;TVXQ&quot;,
+    &quot;country&quot;: null,
+    &quot;disambiguation&quot;: null,
+    &quot;type&quot;: &quot;Group&quot;,
+    &quot;life-span&quot;: { &quot;ended&quot;: false, &quot;begin&quot;: &quot;2003&quot; },
+    &quot;aliases&quot;: [
+        { &quot;name&quot;: &quot;DBSK&quot;, &quot;sort-name&quot;: &quot;DBSK&quot; },
+        { &quot;name&quot;: &quot;Tohoshinki&quot;, &quot;sort-name&quot;: &quot;Tohoshinki&quot;, &quot;locale&quot;: &quot;ja&quot;, &quot;primary&quot;: false },
+        { &quot;name&quot;: &quot;&#xB3D9;&#xBC29;&#xC2E0;&#xAE30;&quot;, &quot;sort-name&quot;: &quot;&#xB3D9;&#xBC29;&#xC2E0;&#xAE30;&quot;, &quot;locale&quot;: &quot;ko_KR&quot;, &quot;primary&quot;: true }
+    ],
+    &quot;tags&quot;: [
+        { &quot;count&quot;: 1, &quot;name&quot;: &quot;kpop&quot; },
+        { &quot;count&quot;: 1, &quot;name&quot;: &quot;jpop&quot; },
+        { &quot;count&quot;: 1, &quot;name&quot;: &quot;cpop&quot; }
+    ],
+    &quot;rating&quot;: { &quot;votes-count&quot;: 8, &quot;value&quot;: 3.9 }
+}
+</pre><p><h3><span class="mw-headline" id="Label">Label</span></h3><p>Request: <a class="external free" href="http://musicbrainz.org/ws/2/label/46f0f4cd-8aab-4b33-b698-f459faf64190?inc=aliases&amp;fmt=json" rel="nofollow">http://musicbrainz.org/ws/2/label/46f0f4cd-8aab-4b33-b698-f459faf64190?inc=aliases&amp;fmt=json</a><br /> Response: <p><code> </code><pre>{
+    &quot;id&quot;: &quot;46f0f4cd-8aab-4b33-b698-f459faf64190&quot;,
+    &quot;name&quot;: &quot;Warp Records&quot;,
+    &quot;sort-name&quot;: &quot;Warp Records&quot;,
+    &quot;label-code&quot;: 2070,
+    &quot;type&quot;: &quot;Original Production&quot;,
+    &quot;country&quot;: &quot;GB&quot;,
+    &quot;life-span&quot;: { &quot;ended&quot;: false, &quot;begin&quot;: &quot;1989&quot; },
+    &quot;tags&quot;: [ { &quot;count&quot;: 2, &quot;name&quot;: &quot;electronic&quot; } ],
+    &quot;disambiguation&quot;: null,
+}
+</pre><p><p>Request: <a class="external free" href="http://musicbrainz.org/ws/2/label/f49e877d-df8d-4a28-bbe1-689d12fc7d91?inc=aliases&amp;fmt=json" rel="nofollow">http://musicbrainz.org/ws/2/label/f49e877d-df8d-4a28-bbe1-689d12fc7d91?inc=aliases&amp;fmt=json</a><br /> Response: <p><code> </code><pre>{
+    &quot;id&quot;: &quot;f49e877d-df8d-4a28-bbe1-689d12fc7d91&quot;
+    &quot;name&quot;: &quot;AVEX ENTERTAINMENT INC.&quot;,
+    &quot;sort-name&quot;: &quot;AVEX ENTERTAINMENT INC.&quot;,
+    &quot;type&quot;: &quot;Production&quot;,
+    &quot;country&quot;: &quot;JP&quot;,
+    &quot;disambiguation&quot;: &quot;avex&#39;s Japanese music production&quot;,
+    &quot;life-span&quot;: { &quot;ended&quot;: false },
+    &quot;aliases&quot;: [
+        { &quot;name&quot;: &quot;AVEX MARKETING&quot;, &quot;sort-name&quot;: &quot;AVEX MARKETING&quot; },
+        { &quot;name&quot;: &quot;avex marketing&quot;, &quot;sort-name&quot;: &quot;avex marketing&quot; },
+        {
+            &quot;name&quot;: &quot;&#x30A8;&#x30A4;&#x30D9;&#x30C3;&#x30AF;&#x30B9;&#x30FB;&#x30A8;&#x30F3;&#x30BF;&#x30C6;&#x30A4;&#x30F3;&#x30E1;&#x30F3;&#x30C8;&quot;,
+            &quot;sort-name&quot;: &quot;&#x30A8;&#x30A4;&#x30D9;&#x30C3;&#x30AF;&#x30B9;&#x30FB;&#x30A8;&#x30F3;&#x30BF;&#x30C6;&#x30A4;&#x30F3;&#x30E1;&#x30F3;&#x30C8;&quot;
+        }
+    ]
+}
+</pre><p><h3><span class="mw-headline" id="Recording">Recording</span></h3><p>Request: <a class="external free" href="http://musicbrainz.org/ws/2/recording/fcbcdc39-8851-4efc-a02a-ab0e13be224f?inc=artist-credits+isrcs+releases&amp;fmt=json" rel="nofollow">http://musicbrainz.org/ws/2/recording/fcbcdc39-8851-4efc-a02a-ab0e13be224f?inc=artist-credits+isrcs+releases&amp;fmt=json</a><br /> Response: <p><code> </code><pre>{
+    &quot;id&quot;: &quot;fcbcdc39-8851-4efc-a02a-ab0e13be224f&quot;,
+    &quot;title&quot;: &quot;LAST ANGEL&quot;,
+    &quot;disambiguation&quot;: &quot;video&quot;,
+    &quot;artist-credit&quot;: [
+        {
+            &quot;name&quot;: &quot;&#x5016;&#x7530;&#x4F86;&#x672A;&quot;,
+            &quot;joinphrase&quot;: &quot; feat. &quot;,
+            &quot;artist&quot;: {
+                &quot;id&quot;: &quot;455641ea-fff4-49f6-8fb4-49f961d8f1ac&quot;,
+                &quot;name&quot;: &quot;&#x5016;&#x7530;&#x4F86;&#x672A;&quot;,
+                &quot;sort-name&quot;: &quot;Koda, Kumi&quot;,
+                &quot;disambiguation&quot;: null
+            }
+        },
+        {
+            &quot;name&quot;: &quot;&#x6771;&#x65B9;&#x795E;&#x8D77;&quot;,
+            &quot;artist&quot;: {
+                &quot;id&quot;: &quot;05cbaf37-6dc2-4f71-a0ce-d633447d90c3&quot;,
+                &quot;name&quot;: &quot;&#x6771;&#x65B9;&#x795E;&#x8D77;&quot;,
+                &quot;sort-name&quot;: &quot;TVXQ&quot;,
+                &quot;disambiguation&quot;: null
+            },
+            &quot;joinphrase&quot;: &quot;&quot;
+        }
+    ],
+    &quot;isrcs&quot;: [ &quot;JPB600760301&quot; ],
+    &quot;length&quot;: 228106,
+    &quot;releases&quot;: [
+        {
+            &quot;id&quot;: &quot;abcd76db-7d5f-3eb7-b386-051c97bfe2e4&quot;,
+            &quot;title&quot;: &quot;Kingdom&quot;,
+            /* some properties omitted to keep this example shorter. */
+        }
+    ]
+}
+</pre><p><h3><span class="mw-headline" id="Release">Release</span></h3><p>Request: <a class="external free" href="http://musicbrainz.org/ws/2/release/59211ea4-ffd2-4ad9-9a4e-941d3148024a?inc=artist-credits+labels+discids+recordings&amp;fmt=json" rel="nofollow">http://musicbrainz.org/ws/2/release/59211ea4-ffd2-4ad9-9a4e-941d3148024a?inc=artist-credits+labels+discids+recordings&amp;fmt=json</a><br /> Response: <p><code> </code><pre>{
+    &quot;id&quot;: &quot;59211ea4-ffd2-4ad9-9a4e-941d3148024a&quot;,
+    &quot;title&quot;: &quot;&aelig;&sup3;o &amp; h&sup3;&aelig;&quot;,
+    &quot;date&quot;: &quot;2003-12-04&quot;,
+    &quot;text-representation&quot;: { &quot;language&quot;: &quot;eng&quot;, &quot;script&quot;: &quot;Latn&quot; },
+    &quot;country&quot;: &quot;GB&quot;,
+    &quot;status&quot;: &quot;Official&quot;,
+    &quot;quality&quot;: &quot;normal&quot;,
+    &quot;release-group&quot;: {
+        &quot;id&quot;: &quot;bb5622c1-65b2-3bc4-83e6-0dcaa56abaf2&quot;,
+        &quot;primary-type&quot;: &quot;EP&quot;
+    },
+    &quot;artist-credit&quot;: [
+        {
+            &quot;joinphrase&quot;: &quot; &amp; &quot;,
+            &quot;name&quot;: &quot;Autechre&quot;,
+            &quot;artist&quot;: {
+                &quot;id&quot;: &quot;410c9baf-5469-44f6-9852-826524b80c61&quot;,
+                &quot;name&quot;: &quot;Autechre&quot;,
+                &quot;sort-name&quot;: &quot;Autechre&quot;,
+                &quot;disambiguation&quot;: null
+            }
+        },
+        {
+            &quot;name&quot;: &quot;The Hafler Trio&quot;,
+            &quot;joinphrase&quot;: &quot;&quot;,
+            &quot;artist&quot;: {
+                &quot;id&quot;: &quot;146c01d0-d3a2-44c3-acb5-9208bce75e14&quot;,
+                &quot;sort-name&quot;: &quot;Hafler Trio, The&quot;,
+                &quot;name&quot;: &quot;The Hafler Trio&quot;,
+                &quot;disambiguation&quot;: null
+            }
+        }
+    ],
+    &quot;label-info&quot;: [
+        {
+            &quot;label&quot;: {
+                &quot;id&quot;: &quot;a0759efa-f583-49ea-9a8d-d5bbce55541c&quot;,
+                &quot;name&quot;: &quot;Phonometrography&quot;,
+                &quot;sort-name&quot;: &quot;Phonometrography&quot;,
+                &quot;label-code&quot;: null,
+                &quot;disambiguation&quot;: null
+            },
+            &quot;catalog-number&quot;: &quot;pgram002&quot;
+        }
+    ],
+    &quot;media&quot;: [
+        {
+            &quot;track-offset&quot;: 0,
+            &quot;track-count&quot;: 1,
+            &quot;title&quot;: &quot;&aelig;&sup3;o&quot;,
+            &quot;format&quot;: &quot;CD&quot;,
+            &quot;discids&quot;: [
+                { &quot;id&quot;: &quot;nN2g3a0ZSjovyIgK3bJl6_.j8C4-&quot;, &quot;sectors&quot;: 73241 }
+            ],
+            &quot;tracks&quot;: [
+                {
+                    &quot;number&quot;: &quot;1&quot;,
+                    &quot;length&quot;: 974546,
+                    &quot;title&quot;: &quot;&aelig;&sup3;o&quot;,
+                    &quot;recording&quot;: { /* recording data omitted for this example. */ },
+                    &quot;artist-credit&quot;: [ /* as on release, not repeated in this example. */ ]
+                }
+            ]
+        },
+        {
+            &quot;track-offset&quot;: 0,
+            &quot;track-count&quot;: 1,
+            &quot;title&quot;: &quot;h&sup3;&aelig;&quot;,
+            &quot;format&quot;: &quot;CD&quot;,
+            &quot;discids&quot;: [
+                { &quot;id&quot;: &quot;aSHvkMnq2jZVFEK.DmSPbvN_f54-&quot;, &quot;sectors&quot;: 69341 }
+            ],
+            &quot;tracks&quot;: [
+                {
+                    &quot;number&quot;: &quot;1&quot;,
+                    &quot;length&quot;: 922546,
+                    &quot;title&quot;: &quot;h&sup3;&aelig;&quot;,
+                    &quot;recording&quot;: { /* recording data omitted for this example. */ },
+                    &quot;artist-credit&quot;: [ /* as on release, not repeated in this example. */ ]
+                }
+            ]
+        }
+    ],
+    &quot;barcode&quot;: null,
+    &quot;disambiguation&quot;: null,
+    &quot;packaging&quot;: null,
+    &quot;asin&quot;: null
+}
+</pre><p><h3><span class="mw-headline" id="Release_Group">Release Group</span></h3><p>Request: <a class="external free" href="http://musicbrainz.org/ws/2/release-group/c9fdb94c-4975-4ed6-a96f-ef6d80bb7738?inc=artist-credits+releases&amp;fmt=json" rel="nofollow">http://musicbrainz.org/ws/2/release-group/c9fdb94c-4975-4ed6-a96f-ef6d80bb7738?inc=artist-credits+releases&amp;fmt=json</a><br /> Response: <p><code> </code><pre>{
+    &quot;id&quot;: &quot;c9fdb94c-4975-4ed6-a96f-ef6d80bb7738&quot;,
+    &quot;first-release-date&quot;: &quot;2012-05-22&quot;,
+    &quot;title&quot;: &quot;The Lost Tape&quot;,
+    &quot;artist-credit&quot;: [
+        &quot;name&quot;: &quot;50 Cent&quot;,
+        &quot;joinphrase&quot;: &quot;&quot;,
+        &quot;artist&quot;: {
+            &quot;id&quot;: &quot;8e68819d-71be-4e7d-b41d-f1df81b01d3f&quot;,
+            &quot;name&quot;: &quot;50 Cent&quot;,
+            &quot;sort-name&quot;: &quot;50 Cent&quot;,
+            &quot;disambiguation&quot;: null
+        }
+    ],
+    &quot;primary-type&quot;: &quot;Album&quot;,
+    &quot;disambiguation&quot;: null,
+    &quot;secondary-types&quot;: [ &quot;Mixtape/Street&quot; ],
+    &quot;releases&quot;: [
+        {
+            &quot;id&quot;: &quot;2ec84eb6-ab92-4ac3-9720-32ad84c34f11&quot;,
+            &quot;title&quot;: &quot;The Lost Tape&quot;,
+            /* some properties omitted to keep this example shorter. */
+        }
+    ]
+}
+</pre><p><h3><span class="mw-headline" id="Work">Work</span></h3><p>Request: <a class="external free" href="http://musicbrainz.org/ws/2/work/b1df2cf3-69a9-3bc0-be44-f71e79b27a22?fmt=json" rel="nofollow">http://musicbrainz.org/ws/2/work/b1df2cf3-69a9-3bc0-be44-f71e79b27a22?fmt=json</a><br /> Response: <p><code> </code><pre>{
+    &quot;id&quot;: &quot;b1df2cf3-69a9-3bc0-be44-f71e79b27a22&quot;,
+    &quot;title&quot;: &quot;HELLO! &#x307E;&#x305F;&#x4F1A;&#x304A;&#x3046;&#x306D;&quot;,
+    &quot;language&quot;: &quot;jpn&quot;,
+    &quot;iswcs&quot;: [ &quot;T-101.690.320-9&quot; ]
+}
+</pre><p><h2><span class="mw-headline" id="Browse_Requests">Browse Requests</span></h2><p>Browse requests return a toplevel object with offset and count properties to help with paging, and a property for the requested entity. The key for this property will be the english plural of the entity, so: artists, labels, recordings, releases, release-groups or works. <p>Request: <a class="external free" href="http://musicbrainz.org/ws/2/release?label=47e718e1-7ee4-460c-b1cc-1192a841c6e5&amp;offset=12&amp;limit=2&amp;fmt=json" rel="nofollow">http://musicbrainz.org/ws/2/release?label=47e718e1-7ee4-460c-b1cc-1192a841c6e5&amp;offset=12&amp;limit=2&amp;fmt=json</a><br /> Response: <p><code> </code><pre>{
+    &quot;releases&quot;: [
+       {
+           &quot;id&quot;: &quot;0b405ea7-8785-402f-bcf7-d55f5000dc3e&quot;,
+           &quot;title&quot;: &quot;Wintertunes&quot;
+           /* some properties omitted to keep this example shorter. */
+       },
+       {
+           &quot;id&quot;: &quot;7eb37a3a-646d-4501-a373-e9071186b88d&quot;,
+           &quot;title&quot;: &quot;Adventure Magic Supreme Journey Music&quot;
+           /* some properties omitted to keep this example shorter. */
+       }
+    ],
+    &quot;release-offset&quot;: 12,
+    &quot;release-count&quot;: 48
+}
+</pre><p><h2><span class="mw-headline" id="Relationships">Relationships</span></h2><p>Request: <a class="external free" href="http://musicbrainz.org/ws/2/release/275b01eb-8551-47ff-bd6b-2d142b4bf422?inc=url-rels&amp;fmt=json" rel="nofollow">http://musicbrainz.org/ws/2/release/275b01eb-8551-47ff-bd6b-2d142b4bf422?inc=url-rels&amp;fmt=json</a><br /> Response: <p><code> </code><pre>{
+    &quot;id&quot;: &quot;275b01eb-8551-47ff-bd6b-2d142b4bf422&quot;,
+    &quot;title&quot;: &quot;Kraftwerk Kover Kollection, Volume 1&quot;,
+    &quot;quality&quot;: &quot;normal&quot;,
+    &quot;text-representation&quot;: { &quot;language&quot;: &quot;eng&quot;, &quot;script&quot;: &quot;Latn&quot; },
+    &quot;date&quot;: &quot;2012&quot;,
+    &quot;relations&quot;: [
+        {
+            &quot;direction&quot;: &quot;backward&quot;,
+            &quot;type&quot;: &quot;download for free&quot;,
+            &quot;url&quot;: &quot;<a class="external free" href="http://soundcloud.com/strictly/kraftwerk-kover-kollection-vol" rel="nofollow">http://soundcloud.com/strictly/kraftwerk-kover-kollection-vol</a>&quot;
+        }
+    ],
+    &quot;country&quot;: null,
+    &quot;status&quot;: null,
+    &quot;barcode&quot;: null,
+    &quot;disambiguation&quot;: null,
+    &quot;packaging&quot;: null,
+    &quot;asin&quot;: null
+}
+</pre><p><p>Request: <a class="external free" href="http://musicbrainz.org/ws/2/work/b1df2cf3-69a9-3bc0-be44-f71e79b27a22?inc=artist-rels+recording-rels&amp;fmt=json" rel="nofollow">http://musicbrainz.org/ws/2/work/b1df2cf3-69a9-3bc0-be44-f71e79b27a22?inc=artist-rels+recording-rels&amp;fmt=json</a><br /> Response: <p><code> </code><pre>{
+  &quot;id&quot;: &quot;b1df2cf3-69a9-3bc0-be44-f71e79b27a22&quot;,
+  &quot;title&quot;: &quot;HELLO! &#x307E;&#x305F;&#x4F1A;&#x304A;&#x3046;&#x306D;&quot;,
+  &quot;language&quot;: &quot;jpn&quot;,
+  &quot;iswcs&quot;: [ &quot;T-101.690.320-9&quot; ],
+  &quot;relations&quot;: [
+        {
+            &quot;direction&quot;: &quot;backward&quot;,
+            &quot;type&quot;: &quot;composer&quot;,
+            &quot;artist&quot;: {
+                &quot;id&quot;: &quot;d997d399-355e-4c49-9c7b-75a93d76bc0e&quot;,
+                &quot;name&quot;: &quot;&#x3064;&#x3093;&#x304F;&#x2642;&quot;,
+                &quot;sort-name&quot;: &quot;Tsunku&quot;,
+                &quot;disambiguation&quot;: null
+            }
+        },
+        {
+            &quot;direction&quot;: &quot;backward&quot;,
+            &quot;type&quot;: &quot;lyricist&quot;,
+            &quot;artist&quot;: {
+                &quot;id&quot;: &quot;d997d399-355e-4c49-9c7b-75a93d76bc0e&quot;,
+                &quot;name&quot;: &quot;&#x3064;&#x3093;&#x304F;&#x2642;&quot;,
+                &quot;sort-name&quot;: &quot;Tsunku&quot;,
+                &quot;disambiguation&quot;: null
+            }
+        },
+        {
+            &quot;direction&quot;: &quot;backward&quot;,
+            &quot;type&quot;: &quot;performance&quot;,
+            &quot;recording&quot;: {
+                &quot;id&quot;: &quot;487cac92-eed5-4efa-8563-c9a818079b9a&quot;,
+                &quot;title&quot;: &quot;HELLO! &#x307E;&#x305F;&#x4F1A;&#x304A;&#x3046;&#x306D; (7&#x4EBA;&#x796D; version)&quot;,
+                &quot;length&quot;: 283600,
+                &quot;disambiguation&quot;: null
+            }
+        },
+        {
+            &quot;type&quot;: &quot;performance&quot;,
+            &quot;direction&quot;: &quot;backward&quot;,
+            &quot;recording&quot;: {
+                &quot;id&quot;: &quot;fd3061c1-cb9a-4698-bc5f-f6e0e6a36272&quot;,
+                &quot;title&quot;: &quot;HELLO! &#x307E;&#x305F;&#x4F1A;&#x304A;&#x3046;&#x306D; (20&#x4EBA;&#x796D; version)&quot;,
+                &quot;length&quot;: 283600,
+                &quot;disambiguation&quot;: &quot;PV&quot;
+            }
+        }
+    ]
+}
+</pre></body></html>            <div class="wikidocs-footer">This page is <a href="http://musicbrainz.org/doc/WikiDocs">transcluded</a> from <a href="//wiki.musicbrainz.org/Development/JSON_Web_Service" class="internal">Development / JSON Web Service</a>.            </div>    </div>            <div style="clear: both"></div>
+        </div>
+
+        <div id="footer">
+            <p class="left">
+                <a href="https://metabrainz.org/donate" class="internal">Donate</a> |
+                <a href="//wiki.musicbrainz.org/" class="internal">Wiki</a> |
+                <a href="http://forums.musicbrainz.org/" class="internal">Forums</a> |
+                <a href="http://tickets.musicbrainz.org/" class="internal">Bug Tracker</a> |
+                <a href="https://twitter.com/MusicBrainz" class="internal">Twitter</a> |
+                <a href="http://musicbrainz.org/set-beta-preference" class="internal">Use beta site</a>                            </p>
+
+            <p class="right">
+                Cover Art provided by the <a href="//coverartarchive.org/">Cover Art Archive</a>. Hosted by <a href="https://www.digitalwest.com/">Digital West</a>. Sponsored by: <a href="https://www.google.com/">Google</a>, <a href="//osuosl.org/">OSUOSL</a> and <a href="https://metabrainz.org/sponsors">others...</a>. 
+            </p>
+        </div>
+    </body>
+</html>
