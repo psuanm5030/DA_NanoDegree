@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>p3 - open streetmap project</title>
+<title>P3 - Open StreetMap Project</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -291,8 +291,10 @@ div#notebook {
 {u'_id': {u'amenity': u'bank'}, u'users_distinct': 57},
 {u'_id': {u'amenity': u'post_office'}, u'users_distinct': 55},
 {u'_id': {u'amenity': u'pharmacy'}, u'users_distinct': 53}]</code></pre></li>
-<li><p>#### Conclusion 1: I found that restaurants were number 1, with 147 unique users creating these tags.  This was of little surprise, as restuarants are constently opening / shutting down.  Maybe there are some owners that thought it was important to get their establishment listed within OSM data (obviously the more places your establishment is defined, the more traffic you can drive to your business).  Further, I imagine it is difficult for one user to cover them all, with the thought that regular contributors are not checking / editing to ensure restaurants are accurately reflected / updated.  I think a strategy to improve the data would be to review the amenities that are not well covered by the community - then spread the word so that contributors focus efforts on the lesser amenities - as shown below - trailer parks, gambling, ev<em>charging, etc.  These are not great examples, but I imagine there are more than 1 ev charging stations (despite this being Pennsylvania and not California).
-<br>_Pipeline Code:</em></p>
+<li><p>#### Conclusion 1: I found that restaurants were number 1, with 147 unique users creating these tags.  This was of little surprise, as restuarants are constently opening / shutting down.  Maybe there are some owners that thought it was important to get their establishment listed within OSM data (obviously the more places your establishment is defined, the more traffic you can drive to your business).  Further, I imagine it is difficult for one user to cover them all, with the thought that regular contributors are not checking / editing to ensure restaurants are accurately reflected / updated.</p>
+</li>
+<li><p>#### Improvement 1: Below is a listing of 10 amenities that had only one tag within the data.  Knowing my city, I know that there are more than one trailer park or ev charinging station.<br>
+<br><em>Pipeline Code:</em></p>
 <pre><code>def make_pipeline_tag_type_distinct_users():
   pipeline = [{'$match':{'amenity':{'$exists':1}}},
               {'$group':{'_id':{'amenity':'$amenity'},
@@ -314,6 +316,8 @@ div#notebook {
 {u'_id': {u'amenity': u'bleachers'}, u'users_distinct': 1},
 {u'_id': {u'amenity': u'education_centre'}, u'users_distinct': 1},
 {u'_id': {u'amenity': u'watering_place'}, u'users_distinct': 1}]</code></pre></li>
+<li><p>#### Improvement 1 (continued): How could we improve upon this?  My favorite idea is "gamification" - the practice of turning tasks (e.g., data entry for OSM data) into a game / contest - where users are rewarded with points for helping improve the quality and robustness of their data.  The points system would be wise to take into account amenities / areas that are not being well covered (e.g., increase the points offered for minimally covered amenities).  However, the points system should have some validation and monitoring, as some users may go to the extreme (and falsify entries to get points, especially items that award them more points).  It would be wise to implement a system to track and notify administrators of "fast-rising users" or users that present suspicious patterns of data entry (e.g., adding public toilets at a high right in a small area).**</p>
+</li>
 </ul>
 
 </div>
@@ -351,6 +355,12 @@ u'name': u'Rivers Casino'},
 <li>There is no address detail for the last two (Mountaineer Casino and Mountaineer Casino, Racetrack and Resort).  This further prevented me from understanding whether someone named the "Mountaineer Casino, Racetrack and Resort" wrong (when it could be "Meadows Casino, Racetrack and Resort" (that was a longshot).  But most importantly, the detail wasnt there (and probably should be). </li>
 </ul>
 </li>
+<li><p>#### Improvement 2: These situations could be improved in two distinct ways:</p>
+<ul>
+<li>1) Add an algorithm to detect potential duplicates.  One of my favorite packages for reviewing for duplicates is fuzzywuzzy <a href="https://github.com/seatgeek/fuzzywuzzy">link to github repo</a>.  This allows you to perform duplicate searching using the following fuzzy matching methods: Levenshtein distance, token sort, and token set. These functions generate scores (e.g., 90 / 100 potential match), which could be reviewed.  This would likely have noted the 'Mountaineer Casino' &amp; 'Mountaineer Casino, Racetrack and Resort' items for review by an administrator (would have been scored 100 on the token set method). </li>
+<li>2) Second, and much more advanced, there could be some checking with other external sources, such as Yelp or Google, via their API.  This could be done in a basic way, building on the gamification theme presented above, where areas of a map are compared with yelp or google via their APIs (e.g., compare the number of restaurants), where shortfalls in the OSM data leads to campaigns to improve the data in that area.  Users would received a multiple (e.g., 2X or 4X) of the standard amount of points for entering data.</li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -383,6 +393,8 @@ u'name': u'Rivers Casino'},
 <li>Second: Post code 15222 is a more prominent zip code in the city of pittsburgh (I lived in Shadyside at one point - a very hip area to live in), but it had less items than 15317.  Yes, I understand that 15317 probably covers more area, but I was still surprised, as there is a great number of amenities within 15222 (restaurants, shops, business, hospitals).  </li>
 <li>Finally: If I had more time and curiosity, I would want to investigate just how significant this thought is (whats the area covered by each post code).  That will be for another time!</li>
 </ul>
+</li>
+<li><p>#### Improvement 3: I will conclude with strengthening my gamification point of view here - noting this is another situation which could be improved through this approach.  An alogrithm could easily be developed which identifies complimentary data which is not complete (e.g., postcode without a city, restaurant without a "cuisine" tag, etc.).  Users could be rewarded with points for filling in these missing data points.</p>
 </li>
 </ul>
 
