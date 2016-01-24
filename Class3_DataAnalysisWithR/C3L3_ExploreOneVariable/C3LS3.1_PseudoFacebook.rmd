@@ -12,8 +12,7 @@ Notes:
 Notes:
 
 ```{r Pseudo-Facebook User Data}
-setwd('/Users/Miller/GitHub/DAnanodegree/Class3_DataAnalysisWithR/C3L3_ExploreOneVariable')
-pf = read.csv('pseudo_facebook.tsv', sep = '\t')
+pf = read.csv('/Users/Miller/GitHub/DAnanodegree/Class3_DataAnalysisWithR/C3L3_ExploreOneVariable/pseudo_facebook.tsv', sep = '\t')
 names(pf) # Column Names
 ```
 
@@ -431,7 +430,14 @@ qplot(x = gender, y = friend_count,
 Notes:
 
 ```{r Box Plots, Quartiles, and Friendships}
+qplot(x = gender, y = friend_count, 
+      data = subset(pf, !is.na(gender)),
+      geom = 'boxplot') + 
+  coord_cartesian(ylim =  c(0,250))
 
+# Analyzing the friend count variable, want to split it over gender, and generate summary function
+by(pf$friend_count, pf$gender, summary)
+# So 75% of females have a friend count below 244 friends, OR 25% of females have friend counts greater than 244
 ```
 
 #### On average, who initiated more friendships in our sample: men or women?
@@ -439,18 +445,38 @@ Response:
 #### Write about some ways that you can verify your answer.
 Response:
 ```{r Friend Requests by Gender}
+qplot(x = gender, y = friendships_initiated, 
+      data = subset(pf, !is.na(pf$gender)),
+      geom = 'boxplot') + 
+  coord_cartesian(ylim = c(0,150))
 
+by(pf$friendships_initiated,pf$gender,summary)
 ```
 
 Response:
-
+I can see by looking at the box plot and the summaries that woman on average initiated more friendships...  The median is just slightly higher (by 5) from 44 for males and 49 for females.  This jives with the mean as well.  Further, we can see that 50% of females have initiated between 19 and 114 friendships.
 ***
 
 ### Getting Logical
-Notes:
+Notes: Want to convert a variable that has alot of 0 values to a binary variable (0 False and 1 True)
 
 ```{r Getting Logical}
+summary(pf$mobile_likes)
+summary(pf$mobile_likes > 0) # Get logical output bc used a comparison operator.
 
+pf$mobile_check_in <- NA #This creates a new variable in the data frame with NA values. 
+pf$mobile_check_in <- ifelse(pf$mobile_likes > 0, 1, 0)
+pf$mobile_check_in <- factor(pf$mobile_check_in)
+summary(pf$mobile_check_in)
+
+# My solution
+anm = summary(pf$mobile_check_in)
+usage = anm[2]/(anm[1] + anm[2])
+usage
+
+# Class solution
+usage_class_solution = sum(pf$mobile_check_in == 1) / length(pf$mobile_check_in) # Length is the length of the vector
+usage_class_solution
 ```
 
 Response:
@@ -459,7 +485,7 @@ Response:
 
 ### Analyzing One Variable
 Reflection:
-
+First and foremost, I learned about exploration of data using simple visualizations and general table summaries.  Exploring my data allowed me to further understand the data and generate new thoughts about how to interpret / analyze the data.  
 ***
 
 Click **KnitHTML** to see all of your hard work and to have an html
