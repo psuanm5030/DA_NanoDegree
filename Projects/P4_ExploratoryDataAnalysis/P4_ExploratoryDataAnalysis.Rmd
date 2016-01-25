@@ -13,8 +13,18 @@ With that said, please find below my stated purpose:
 2. Present several final plots which I find interesting, insightful and / or particularly significant.  
 3. Conclude with a reflections section, rounding out my understanding and thoughts of the data and analysis.  
 
+```{r global_options, include=FALSE} 
+knitr::opts_chunk$set(fig.width=12, 
+                      fig.height=8, 
+                      fig.path='Figs/', 
+                      echo=FALSE, 
+                      warning=FALSE, 
+                      message=FALSE)
+```
+
+
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,warning=FALSE, message=FALSE)
 library(gridExtra)
 library(ggplot2)
 library(GGally)
@@ -30,7 +40,12 @@ library(Hmisc)
 ## Importation of Dataset
 ```{r Import Data with Initial Prep}
 # Import the Red Wine Quality dataset
-rw <- read.csv('/Users/Miller/GitHub/DAnanodegree/Projects/P4_ExploratoryDataAnalysis/reds.csv', sep = ',', colClasses = c('character','numeric','numeric','numeric','numeric','numeric','numeric','numeric','numeric','numeric','numeric','numeric','numeric'))
+rw <- read.csv('/Users/Miller/GitHub/DAnanodegree/Projects/P4_ExploratoryDataAnalysis/reds.csv', 
+               sep = ',', 
+               colClasses = c('character','numeric','numeric','numeric',
+                              'numeric','numeric','numeric','numeric',
+                              'numeric','numeric','numeric','numeric',
+                              'numeric'))
 ```
 Within the import syntax, I included the "colClasses" syntax, as the variables were all imported as factors, when I require numeric.  The structure of my data is as follows:  
 a. There are 1599 observations (wines) in the dataset.  
@@ -119,7 +134,8 @@ Overall, we can see the extreme right-skewedness of this data.  From looking on 
   
 Let's zoom in to see how many wines are less than 1 gram.
 ```{r Quick Look 2.2 - Residual Sugars}
-# Zoom in on the left portion of the x-axis - see how many wines are less than 1 gram
+# Zoom in on the left portion of the x-axis - 
+# see how many wines are less than 1 gram
 ggplot(aes(residual.sugar), data = rw) + 
   geom_histogram(binwidth = .1) + 
   scale_x_continuous(breaks = seq(0,16,1)) + 
@@ -192,7 +208,8 @@ with(rw, cor.test(pH,fixed.acidity, method = 'pearson'))
 rw[rw$fixed.acidity>12,'pH']
 mean(rw$pH) # Get the mean for pH
 sd(rw$pH) # SD of 0.15 means little variation of the values from the mean.
-mean(rw[rw$fixed.acidity>12,'pH']) # Mean of 3.08 is versus full dataset of 3.3 - roughly 1.5 standard deviations from the mean.
+mean(rw[rw$fixed.acidity>12,'pH']) # Mean of 3.08 is versus full dataset of 3.3 
+# - roughly 1.5 standard deviations from the mean.
 ```
 The following limited observations:  
 
@@ -342,7 +359,8 @@ First, I would like to investigate the correlations of all the variables.
 I do this in two ways: 1) Correlation table, and 2) ggpairs variable pairs plots (visual component).
 ```{r Correlations}
 # Correlation Table
-rw.num <- rw[, seq(2,13,1)] # Take all original variables, except the ID field (column 1)
+rw.num <- rw[, seq(2,13,1)] # Take all original variables, except the 
+# ID field (column 1)
 cor(rw.num, method = 'pearson') 
 
 # Visual Correlations
@@ -402,20 +420,26 @@ We can tell that most of our observations (90%) are less than 12% alcohol, with 
 
 Lets find out how this relates to quality? To do this, I will create a categorical variable based upon the mean of quality.  
 ```{r Deep Dive: Alcohol - 2.1}
-# Creating a new variable that assigns one of two text values (Above or Below Average) based upon the quality value.
+# Creating a new variable that assigns one of two text values 
+# (Above or Below Average) based upon the quality value.
 summary(rw$quality) # Mean of 5.636 - use 5 as the 'Average' value
-# Using only two categories for easier interpretation (i.e., no "Average" category).
+# Using only two categories for easier interpretation 
+# (i.e., no "Average" category).
 rw$qTerm <- ifelse(rw$quality <= 5, 'Below Average', 'Above Average')
 table(rw$qTerm) # Check the counts
 
 # Show a box plot
-boxplot(rw$alcohol ~ rw$qTerm) # See that the difference between "Above Average" and the others visually significant.
+boxplot(rw$alcohol ~ rw$qTerm) # See that the difference between "Above Average" 
+# and the others visually significant.
 ```
   
 Box plot clearly shows us that there below average wines absolutely have a lower alcohol content.  We can also see the difference in the outliers!  Lets take a few other looks by qTerm.
 ```{r Deep Dive: Alcohol - 2.2}
-# Faceted distribution - This is clear indication of the skewedness of below average wines (less alcohol).
-ggplot(aes(alcohol), data = rw) + geom_histogram(binwidth = .1) + facet_wrap(~ qTerm)
+# Faceted distribution - This is clear indication of the skewedness of 
+# below average wines (less alcohol).
+ggplot(aes(alcohol), data = rw) + 
+  geom_histogram(binwidth = .1) + 
+  facet_wrap(~ qTerm)
 
 # # Frequency Polygon: Raw Counts
 # ggplot(aes(alcohol), data = rw) + 
@@ -439,24 +463,24 @@ Here are some observations regarding the plots above:
 Comparison Section: Let's see how alcohol and the other variables might combine to affect quality.
 ```{r Deep Dive: Alcohol - Other Variables}
 ggplot(rw,aes(alcohol, volatile.acidity)) + 
-  geom_point(aes(color = quality), alpha = 3/4) + 
+  geom_point(aes(color = as.factor(quality)), alpha = 3/4) + 
   geom_smooth(method = 'lm') + 
-  scale_color_gradient2(low = muted("red"), mid = "white", high = muted("blue"), midpoint = 5)
+  scale_color_brewer(palette = 'Greens')
 
 ggplot(rw,aes(alcohol, chlorides)) + 
-  geom_point(aes(color = quality), alpha = 3/4) + 
+  geom_point(aes(color = as.factor(quality)), alpha = 3/4) + 
   geom_smooth(method = 'lm') + 
-  scale_color_gradient2(low = muted("red"), mid = "white", high = muted("blue"), midpoint = 5)
+  scale_color_brewer(palette = 'Greens')
 
 ggplot(rw,aes(alcohol, sulphates)) + 
-  geom_point(aes(color = quality), alpha = 3/4) + 
+  geom_point(aes(color = as.factor(quality)), alpha = 3/4) + 
   geom_smooth(method = 'lm') + 
-  scale_color_gradient2(low = muted("red"), mid = "white", high = muted("blue"), midpoint = 5)
+  scale_color_brewer(palette = 'Greens')
 
 ggplot(rw,aes(alcohol, total.sulfur.dioxide)) + 
-  geom_point(aes(color = quality), alpha = 3/4) + 
+  geom_point(aes(color = as.factor(quality)), alpha = 3/4) + 
   geom_smooth(method = 'lm') + 
-  scale_color_gradient2(low = muted("red"), mid = "white", high = muted("blue"), midpoint = 5)
+  scale_color_brewer(palette = 'Greens')
 ```
   
 Of all the plots above, I believe that Volatile Acidity and Alcohol have the best trend, where more alcohol and less volatile acid appears to equate with higher rated wines.  Still this is not a conclusive plot.  
@@ -467,7 +491,8 @@ We know that volatile acidity can affect the taste of wine at high levels (unple
 ```{r Deep Dive: Volatile Acidity - 1}
 # First - Lets Put Acidity into 3 intervals
 summary(rw$volatile.acidity)
-# Segregate into equal intervals (i.e., low, medium and high amounts of volatile acidity)
+# Segregate into equal intervals 
+# (i.e., low, medium and high amounts of volatile acidity)
 rw$vaCat <- cut2(rw$volatile.acidity, g=3)
 table(rw$vaCat)
 
@@ -514,7 +539,9 @@ Hmmm.... I detect a slight pattern amongst the level of alcohol, however and unf
 ```{r Deep Dive: Chlorides - 4}
 # How about Alcoholic vs. Savory?
 # Using a diverging color pallete  
-ggplot(aes(log(chlorides), log(alcohol), color = as.factor(quality)), data = rw) + 
+ggplot(aes(log(chlorides), log(alcohol), 
+           color = as.factor(quality)), 
+       data = rw) + 
   geom_point(alpha = 2/4, size = 3) + 
   scale_color_brewer(palette = 'PiYG')
 ```
@@ -524,16 +551,18 @@ This is a bit clearer - seeing a slight tendency towards lower salt and higher a
 ### Total Sulphur Dioxide  
 We know that from the variables definition that this variable is mostly undetectable by humans in low doses, but that above 50ppm, there can be affects to the nose and taste.  We don't know if that helps or hurts the wines?  Lets try and find out.
 ```{r Deep Dive: Total Sulphur Dioxide - 1}
-# I remember that the variable is very right-skewed.  However a log transformation of is much more normal.
+# I remember that the variable is very right-skewed.  
+# However a log transformation of is much more normal.
 ggplot(aes(log(total.sulfur.dioxide), fill = qTerm), data = rw) + 
   geom_histogram()
 ```
   
 Looking at this, I am not convinced of the effect just yet.  Lets break down this a bit further.  
 ```{r Deep Dive: Total Sulphur Dioxide - 2}
-summary(rw$total.sulfur.dioxide) # Mean is 46.47 - we know effects are possible beyond 50
+summary(rw$total.sulfur.dioxide) # Mean is 46.47 - effects r possible > 50
 # Divide the values into two buckets
-rw$soCat <- cut(rw$total.sulfur.dioxide, breaks = c(0,50,300), labels = c('No Effect','Potential Effect'))
+rw$soCat <- cut(rw$total.sulfur.dioxide, breaks = c(0,50,300), 
+                labels = c('No Effect','Potential Effect'))
 # Lets take a look at the proportions of both categories.
 t1 = table(rw$quality, rw$soCat, exclude = 'No Effect')
 t2 = table(rw$quality, rw$soCat, exclude = 'Potential Effect')
@@ -551,7 +580,8 @@ While there are about twice as many wines where the total sulfur dioxide is less
 ### Sulphates
 Sulphates to me are very interesting because intuitively and based upon the definition (a wine additive which can contribute to sulfur dioxide gas (S02) levels, which acts as an antimicrobial and antioxidant) don't seem that interesting, but are showing some correlation and linkage to quality!  Lets explore:
 ```{r Deep Dive: Sulphates}
-# Remember, we showed that sulphates were were right-skewed in the histogram above.  Lets take a look at its linkage to quality.
+# Remember, we showed that sulphates were were right-skewed in the histogram above.  
+# Lets take a look at its linkage to quality.
 ggplot(rw,aes(log(sulphates),log(alcohol))) + 
   geom_point(aes(color = as.factor(round(quality)))) + 
   scale_color_brewer(palette = 'Greens') + 
@@ -567,7 +597,8 @@ I have selected three (3) plots from my above analyses. Below, I have polished a
   
 **Final Plot #1**
 ```{r First Final Plot}
-# The Frequency polygon plot clearly points out the difference between higher quality and lower quality wines.
+# The Frequency polygon plot clearly points out the difference 
+# between higher quality and lower quality wines.
 ggplot(aes(alcohol, ..count../sum(..count..)), data = rw) + 
   geom_freqpoly(aes(color = qTerm), binwidth = .1) + 
   scale_x_continuous(breaks = seq(8,15,.5)) + 
@@ -589,7 +620,9 @@ I selected this plot to show in my final plots section because I find the crosso
 ```{r Second Final Plot}
 ggplot(rw,aes(log(sulphates),log(alcohol))) + 
   geom_point(aes(color = as.factor(round(quality)))) + 
-  scale_color_brewer(palette = 'Greens', name = 'Quality Rating',guide = guide_legend(reverse=TRUE)) + 
+  scale_color_brewer(palette = 'Greens', 
+                     name = 'Quality Rating',
+                     guide = guide_legend(reverse=TRUE)) + 
   geom_smooth(method = 'lm') + 
   xlab('Sulphates Content (log)') + 
   ylab('Alcohol Content (log)') + 
@@ -604,11 +637,15 @@ I selected this plot to show in my final plots section because of the pattern th
 ```{r Third Final Plot}
 ggplot(aes(quality, fill = vaCat), data = rw) + 
   geom_bar() + 
-  scale_fill_brewer(type = 'seq', palette = 3, name = 'Volatile Acid Content',guide = guide_legend(reverse=TRUE),labels=c("Low", "Medium", "High")) + 
+  scale_fill_brewer(type = 'seq', palette = 3, name = 'Volatile Acid Content',
+                    guide = guide_legend(reverse=TRUE),
+                    labels=c("Low", "Medium", "High")) + 
   xlab('Quality Rating') + 
   ylab('Count of Observations (Wines)') + 
   ggtitle('No. of Wines by Quality Rating (by Interval of Volatile Acid)') + 
-  theme(panel.background = element_rect(fill = 'white',colour = 'red'),panel.grid.major = element_line(colour="grey"),panel.grid.minor = element_line(colour="grey"))
+  theme(panel.background = element_rect(fill = 'white',colour = 'red'),
+        panel.grid.major = element_line(colour="grey"),
+        panel.grid.minor = element_line(colour="grey"))
 ```
   
 I selected this plot for its relative simplicity.  The audience can see quickly that there is a relation between the quaility rating and the amount of volatile acid. Comparisons can easily be distinguished as the quality rating improves, particularly that there are more high quality wines with lower amounts of volatile acid and conversly there are more low quality wines with creater amounts of volatile acid.  If I could see the amount of volatile acid on the wine label, I'd likely look to buy to the wines with a lower quantity!  
