@@ -73,6 +73,7 @@ def make_request(data):
 
 def test():
     data = extract_data(html_page)
+    print data
     assert data["eventvalidation"] != ""
     assert data["eventvalidation"].startswith("/wEWjAkCoIj1ng0")
     assert data["viewstate"].startswith("/wEPDwUKLTI")
