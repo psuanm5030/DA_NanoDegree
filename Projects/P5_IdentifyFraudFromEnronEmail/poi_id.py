@@ -1,8 +1,14 @@
 #!/usr/bin/python
 
+# P5: Identify Fraud from Enron Email
+# Student: Andy Miller
+# Udacity's Data Analyst Nanodegree (https://www.udacity.com/course/nd002)
+
+
 import sys
 sys.path.append("/Users/Miller/GitHub/DAnanodegree/Class4_Intro_ML/UD120/ud120-projects/tools")
 sys.path.append("/Users/Miller/GitHub/DAnanodegree/Class4_Intro_ML/UD120/ud120-projects/final_project")
+sys.path.append("/Users/Miller/GitHub/DAnanodegree/Projects/P5_IdentifyFraudFromEnronEmail")
 import os
 import operator
 from time import time
@@ -17,13 +23,11 @@ import statistics as stat
 
 
 ### TASK 1: SELECT THE FEATURES TO USE AND LOAD DATA ###
-# Listing of ALL Features:
+# Listing of Features:
 features_list = ['poi', 'salary', 'deferral_payments', 'total_payments', 'exercised_stock_options',
                  'bonus', 'restricted_stock', 'restricted_stock_deferred', 'total_stock_value',
                  'expenses', 'loan_advances', 'other', 'director_fees', 'deferred_income',
-                 'long_term_incentive','Ratio_from_POI','Ratio_to_POI']
-# Refined Listing of Features (post pipeline evaluation):
-# features_list = ['poi','salary', 'bonus','total_stock_value','Ratio_from_POI','Ratio_to_POI']
+                 'long_term_incentive','Ratio_from_POI','Ratio_to_POI','from_messages','shared_receipt_with_poi','to_messages']
 
 ### Load the dictionary containing the dataset
 with open("/Users/Miller/GitHub/DAnanodegree/Class4_Intro_ML/UD120/ud120-projects/final_project/final_project_dataset.pkl", "r") as data_file:
@@ -31,12 +35,12 @@ with open("/Users/Miller/GitHub/DAnanodegree/Class4_Intro_ML/UD120/ud120-project
 
 ### TASK 2: REMOVE OUTLIERS ###
 
-# 2.1 - Check NaNs by Row
+# 2.1 - Check NaNs by Observation to determine if any users have alot of NaNs and should be excluded.
 def check_nan_row(dict):
     """
-    Check the number of NaNs per row
+    Check NaNs by Observation to determine if any users have alot of NaNs and should be excluded.
     Args:
-        dict:
+        dict: data dictionary
 
     Returns: Dictionary for each person with the count of NaNs and percentage of columns
     """
@@ -53,6 +57,7 @@ def check_nan_row(dict):
     return final_row
 
 row_check = check_nan_row(data_dict)
+print '\nNaN Checks for Each Observation'
 pp.pprint(row_check)
 """Results
 {'ALLEN PHILLIP K': {'Cnt': 2, 'Perc': 0.1},
@@ -203,19 +208,20 @@ pp.pprint(row_check)
  'YEAP SOON': {'Cnt': 16, 'Perc': 0.76}}
 """
 # Get a look at the user entries that have a high percentage of blanks.
+print '\nObservations with over 80% of Features with NaNs'
 for k in row_check.iterkeys():
     if row_check[k]['Perc'] > 0.80:
         print k
         print row_check[k]
 
-# 2.2 - Check the % of NaNs for each feature
+# 2.2 - Check the % of NaNs for each feature - for general understanding.
 def check_nan_features(dict):
     """
     Checks the percentage of NaNs for each feature in the data.
     Args:
-        dict: data with all features and values
+        dict: data dictionary
 
-    Returns: dict of all features iwth the percentage of NaNs
+    Returns: dict of all features with the percentage of NaNs
     """
     final = {}
     ftrs_list = dict[dict.keys()[0]].keys()
@@ -230,6 +236,7 @@ def check_nan_features(dict):
 
 nans_check = check_nan_features(data_dict)
 sorted_nans_check = sorted(nans_check.items(), key=operator.itemgetter(1))
+print '\nNaN Checks for Each Feature'
 print sorted_nans_check
 """
 [('poi', 0.0), ('total_stock_value', 0.136986301369863), ('total_payments', 0.14383561643835616), ('email_address', 0.23972602739726026), ('restricted_stock', 0.2465753424657534), ('exercised_stock_options', 0.3013698630136986), ('salary', 0.3493150684931507), ('expenses', 0.3493150684931507), ('other', 0.363013698630137), ('to_messages', 0.410958904109589), ('shared_receipt_with_poi', 0.410958904109589), ('from_messages', 0.410958904109589), ('from_poi_to_this_person', 0.410958904109589), ('from_this_person_to_poi', 0.410958904109589), ('bonus', 0.4383561643835616), ('long_term_incentive', 0.547945205479452), ('deferred_income', 0.6643835616438356), ('deferral_payments', 0.7328767123287672), ('restricted_stock_deferred', 0.8767123287671232), ('director_fees', 0.8835616438356164), ('loan_advances', 0.9726027397260274)]
@@ -248,13 +255,16 @@ data_dict.pop('THE TRAVEL AGENCY IN THE PARK') # Remove from the data, as this i
 data_dict.pop('LOCKHART EUGENE E') # Remove from the data, as this person has 95% of features as 'NAN'
 len(data_dict) # Check AFTER POP number of keys
 
-
 ### TASK 3: CREATE NEW FEATURES ###
 
 # Created Feature #1 & #2 - Ration of Messages FROM POI and TO POI
 def compute_ratio(dict):
     """
     Create a ratio of the messages the person received from a POI from all the messages they received.
+    Args:
+        dict: data dictionary (excl. outliers) - key by key
+
+    Returns: tuple of ratios iteratively for each dictionary key
     """
     if (dict['from_this_person_to_poi'] == 'NaN') or (dict['to_messages'] == 'NaN' or dict['to_messages'] == 0):
         to_poi = 0.
@@ -271,14 +281,12 @@ def compute_ratio(dict):
 for key in data_dict:
     data_dict[key]['Ratio_from_POI'], data_dict[key]['Ratio_to_POI'] = compute_ratio(data_dict[key])
 
-
 ### Store to my_dataset for easy export below.
 my_dataset = data_dict
 
 ### Extract features and labels from dataset for local testing
 data = featureFormat(my_dataset, features_list, sort_keys = True)
 labels, features = targetFeatureSplit(data)
-
 
 ### TASK 4: TRY CLASSIFIERS ###
 
@@ -299,13 +307,20 @@ from sklearn.svm import SVC
 from sklearn.metrics import classification_report
 from sklearn.cross_validation import StratifiedShuffleSplit
 
-# First - I would like to review the best features, per sklearns selectkbest
+# Prior to configuring my pipelines, I would like to review the features and their importance.
 from sklearn.feature_selection import SelectKBest
 
-def get_k_best(data_dict, features_list, k):
-    '''
-    Runs SelectKBest on the dictionary and returns a dictionary
-    '''
+def find_k_best(data_dict, features_list, k):
+    """
+    Figure out the effectiveness of each feature in terms of their predictive capacity.
+    Args:
+        data_dict: data dictionary
+        features_list: features
+        k: number of features to check scores for
+
+    Returns: dict of features and their respective scores.
+
+    """
     data = featureFormat(data_dict, features_list)
     labels, features = targetFeatureSplit(data)
 
@@ -318,38 +333,17 @@ def get_k_best(data_dict, features_list, k):
     return best_feats
 
 num = 15 # Get the top 15
-best_features = get_k_best(my_dataset, features_list, num)
+best_features = find_k_best(my_dataset, features_list, num)
 best_features_sort = sorted(best_features.items(), reverse=True, key=lambda tup: tup[1])
-print 'Best Features: '
+print '\nBest Features (per SelectKBest): '
 pp.pprint(best_features_sort)
 
-"""
-** Results Archive - No Modifications **
-GaussianNB()
-	Accuracy: 0.79660	Precision: 0.46398	Recall: 0.10950	F1: 0.17718	F2: 0.12925
-	Total predictions: 10000	True positives:  219	False positives:  253	False negatives: 1781	True negatives: 7747
-
-DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
-            max_features=None, max_leaf_nodes=None, min_samples_leaf=1,
-            min_samples_split=40, min_weight_fraction_leaf=0.0,
-            presort=False, random_state=None, splitter='best')
-	Accuracy: 0.74740	Precision: 0.10746	Recall: 0.03600	F1: 0.05393	F2: 0.04152
-	Total predictions: 10000	True positives:   72	False positives:  598	False negatives: 1928	True negatives: 7402
-
-Got a divide by zero when trying out:
-SVC(C=10000.0, cache_size=200, class_weight=None, coef0=0.0,
-  decision_function_shape=None, degree=3, gamma='auto', kernel='rbf',
-  max_iter=-1, probability=False, random_state=None, shrinking=True,
-  tol=0.001, verbose=False)
-Precision or recall may be undefined due to a lack of true positive predicitons.
-"""
-
-# Build a Pipeline (http://scikit-learn.org/stable/modules/pipeline.html)
+# Build out Pipelines for each Classifier being used:
 
 def build_SVM():
     """
     Setup the pipeline and parameters for the SVM Algo.
-    Returns: the correct pipeline and paraters to feed into the grid search function.
+    Returns: the correct pipeline and parameters to feed into the grid search function.
     """
     estimators = [('Scale',MinMaxScaler()),  ('SKB', SelectKBest()), ('PCA', RandomizedPCA()), ('SVM', SVC())]
     pipe = Pipeline(estimators)
@@ -362,15 +356,15 @@ def build_SVM():
         'PCA__n_components': [1,2,3],
         'PCA__whiten': [True],
         'SVM__kernel': ['rbf', 'linear'],
-        'SVM__C': [100.0, 1000.0, 10000.0],
-        'SVM__gamma': [0.001, 0.0001]
+        'SVM__C': [10.0, 100.0, 1000.0, 10000.0],
+        'SVM__gamma': [0.01, 0.001, 0.0001]
     }
     return pipe, parameters
 
 def build_NB():
     """
     Setup the pipeline and parameters for the Naive Bayes Algo.
-    Returns: the correct pipeline and paraters to feed into the grid search function.
+    Returns: the correct pipeline and parameters to feed into the grid search function.
     """
     estimators = [('Scale',MinMaxScaler()), ('SKB', SelectKBest()), ('PCA', RandomizedPCA()), ('NB', GaussianNB())]
     pipe = Pipeline(estimators)
@@ -387,7 +381,7 @@ def build_NB():
 def build_ADA():
     """
     Setup the pipeline and parameters for the ADA Boost Algo.
-    Returns: the correct pipeline and paraters to feed into the grid search function.
+    Returns: the correct pipeline and parameters to feed into the grid search function.
     """
     estimators = [('Scale',MinMaxScaler()), ('SKB', SelectKBest()), ('PCA', RandomizedPCA()), ('ADA',
                                                                                                AdaBoostClassifier())]
@@ -400,7 +394,7 @@ def build_ADA():
         'PCA__n_components': [2,3],
         'PCA__whiten': [True],
         'ADA__n_estimators':[50,75,100],
-        'ADA__learning_rate':[1],
+        'ADA__learning_rate':[0.1,0.15,0.2,0.3,0.4,0.5,0.9,1],
         'ADA__algorithm':['SAMME.R','SAMME']
     }
     return pipe, parameters
@@ -409,7 +403,6 @@ def build_DT():
     """
     Setup the pipeline and parameters for the Decision Tree Algo.
     Returns: the correct pipeline and parameters to feed into the grid search function.
-
     """
     estimators = [('SKB', SelectKBest()), ('PCA', RandomizedPCA()), ('DT', DecisionTreeClassifier())]
     pipe = Pipeline(estimators)
@@ -448,7 +441,7 @@ def build_LOG():
 def build_KNN():
     """
     Setup the pipeline and parameters for the K-Nearest Neighbors Algo.
-    Returns: the correct pipeline and paraters to feed into the grid search function.
+    Returns: the correct pipeline and parameters to feed into the grid search function.
 
     """
     estimators = [('Scale',MinMaxScaler()), ('SKB', SelectKBest()), ('PCA', RandomizedPCA()),('KNN', KNeighborsClassifier())]
@@ -469,7 +462,7 @@ def build_KNN():
 def build_Cluster():
     """
     Setup the pipeline and parameters for the K-Means Cluster Algo.
-    Returns: the correct pipeline and paraters to feed into the grid search function.
+    Returns: the correct pipeline and parameters to feed into the grid search function.
     """
     estimators = [('Scale',MinMaxScaler()), ('SKB', SelectKBest()), ('PCA', RandomizedPCA()),('KM', KMeans())]
     pipe = Pipeline(estimators)
@@ -488,7 +481,7 @@ def build_Cluster():
 def build_RF():
     """
     Setup the pipeline and parameters for the Random Forest Algo.
-    Returns: the correct pipeline and paraters to feed into the grid search function.
+    Returns: the correct pipeline and parameters to feed into the grid search function.
     """
     estimators = [('Scale',MinMaxScaler()), ('SKB', SelectKBest()), ('PCA', RandomizedPCA()),('RF',
                                                                                                RandomForestClassifier())]
@@ -508,9 +501,10 @@ def build_RF():
     }
     return pipe, parameters
 
+# Build out the Pipeline execution, including stratified shuffle split
 def main_pipe_review(type, features, labels):
     """
-    Consolidated function to test various algorithms and get the best classifer in return.
+    Consolidated function to test various algorithms and get the best classifier in return.
     Args:
         type (str): What algo is to be used.  Values consist of: SVM, RF, DT, NB, or Cluster
         data (tuple): Both features and labels
@@ -548,9 +542,8 @@ def main_pipe_review(type, features, labels):
     # Create a Stratified Shuffle Split iterator for cv
     sss = StratifiedShuffleSplit(
         labels,
-        n_iter=20,
-        test_size=0.5,
-        random_state=0
+        n_iter=1000,
+        random_state=42
     )
 
     gs = GridSearchCV(pipe, parameters, n_jobs=-1, verbose=1, cv=sss)
@@ -594,9 +587,9 @@ features_train, features_test, labels_train, labels_test = \
 # Returns list of the following:
 # [gs.best_estimator_, gs.best_estimator_.get_params(), gs.predict(features),features_selected_list]
 
-# algo_type = 'SVM' # Good
-algo_type = 'DT' # Good - Best: Accuracy: 0.80569	Precision: 0.35921	Recall: 0.33550
-# algo_type = 'NB' # Good - Best: Accuracy: 0.87714	Precision: 0.61628	Recall: 0.37100
+# algo_type = 'SVM' # Good - Best: Accuracy: 0.86529	Precision: 0.82386	Recall: 0.07250
+# algo_type = 'DT' # Good - Best: Accuracy: 0.80569	Precision: 0.35921	Recall: 0.33550
+algo_type = 'NB' # Good - Best: Accuracy: 0.87714	Precision: 0.61628	Recall: 0.37100
 # algo_type = 'RF' # Good - Best: Accuracy: 0.85129	Precision: 0.43212	Recall: 0.13050
 # algo_type = 'Cluster' # Good - Best: Accuracy: 0.72977	Precision: 0.22660	Recall: 0.31350
 # algo_type = 'KNN' # Good - Best: Accuracy: 0.84592	Precision: 0.20000	Recall: 0.00050
@@ -631,9 +624,8 @@ print classification_report(labels, labels_pred), '\n'
 print "tester.py Classification report:\n"
 test_classifier(clf, my_dataset, final_features_list)
 
-"""
+""" Notes on performance
 NB:
-????
 
 Pipeline(steps=[('Scale', MinMaxScaler(copy=True, feature_range=(0, 1))), ('SKB', SelectKBest(k=6, score_func=<function f_classif at 0x10caafc08>)), ('PCA', RandomizedPCA(copy=True, iterated_power=3, n_components=2, random_state=None,
        whiten=True)), ('NB', GaussianNB())])
@@ -681,7 +673,24 @@ Classification Performance Report:
 avg / total       0.89      0.91      0.90        43
 
 SVM:
+['salary', 'exercised_stock_options', 'bonus', 'total_stock_value', 'deferred_income']
 
+Pipeline(steps=[('Scale', MinMaxScaler(copy=True, feature_range=(0, 1))), ('SKB', SelectKBest(k=5, score_func=<function f_classif at 0x10d18b320>)), ('PCA', RandomizedPCA(copy=True, iterated_power=3, n_components=1, random_state=None,
+       whiten=True)), ('SVM', SVC(C=10.0, cache_size=200, class_weight=None, coef0=0.0,
+  decision_function_shape=None, degree=3, gamma=0.01, kernel='rbf',
+  max_iter=-1, probability=False, random_state=None, shrinking=True,
+  tol=0.001, verbose=False))])
+	Accuracy: 0.86529	Precision: 0.82386	Recall: 0.07250	F1: 0.13327	F2: 0.08867
+	Total predictions: 14000	True positives:  145	False positives:   31	False negatives: 1855	True negatives: 11969
+
+
+Classification Performance Report:
+             precision    recall  f1-score   support
+
+        0.0       0.88      1.00      0.94        38
+        1.0       0.00      0.00      0.00         5
+
+avg / total       0.78      0.88      0.83        43
 
 DT:
 ['salary', 'exercised_stock_options', 'bonus', 'total_stock_value', 'deferred_income']
@@ -863,4 +872,5 @@ print classification_report(labels_test, pred)
 ### that the version of poi_id.py that you submit can be run on its own and
 ### generates the necessary .pkl files for validating your results.
 
-# dump_classifier_and_data(clf, my_dataset, features_list)
+dump_classifier_and_data(clf, my_dataset, final_features_list)
+print 'Project Completed :-)'
