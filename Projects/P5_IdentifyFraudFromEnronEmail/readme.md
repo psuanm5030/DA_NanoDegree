@@ -50,6 +50,7 @@ What features did I use and how did I pick them?
 I utilized the univariate feature selection method of SelectKBest, embedded within my pipelines, to select the 
 most relevant features.  This method selects the K best features that are the most powerful.  Prior to the 
 pipeline, I evaluated the best 15 features found through this method and the associated scores.  
+
 | Feature                 | Score↑ |
 |-------------------------|-------:|
 | exercised_stock_options | 24.815 |
