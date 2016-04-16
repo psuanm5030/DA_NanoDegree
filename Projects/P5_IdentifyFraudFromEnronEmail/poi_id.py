@@ -6,6 +6,7 @@
 
 
 import sys
+os.chdir("/Users/Miller/GitHub/DAnanodegree/Projects/P5_IdentifyFraudFromEnronEmail")
 sys.path.append("/Users/Miller/GitHub/DAnanodegree/Class4_Intro_ML/UD120/ud120-projects/tools")
 sys.path.append("/Users/Miller/GitHub/DAnanodegree/Class4_Intro_ML/UD120/ud120-projects/final_project")
 sys.path.append("/Users/Miller/GitHub/DAnanodegree/Projects/P5_IdentifyFraudFromEnronEmail")
@@ -29,8 +30,9 @@ features_list = ['poi', 'salary', 'deferral_payments', 'total_payments', 'exerci
                  'expenses', 'loan_advances', 'other', 'director_fees', 'deferred_income',
                  'long_term_incentive','Ratio_from_POI','Ratio_to_POI','from_messages','shared_receipt_with_poi','to_messages']
 
+
 ### Load the dictionary containing the dataset
-with open("/Users/Miller/GitHub/DAnanodegree/Class4_Intro_ML/UD120/ud120-projects/final_project/final_project_dataset.pkl", "r") as data_file:
+with open("final_project_dataset.pkl", "r") as data_file:
     data_dict = pickle.load(data_file)
 
 ### TASK 2: REMOVE OUTLIERS ###

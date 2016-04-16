@@ -80,7 +80,9 @@ Table 3. Scaling Evaluation
 Overall, it should be noted that I did not use normalization tactics, MinMaxScaler, in all my classifier pipelines, as scaling doesn't have an affect for  some algorithms.  I did not use the scaling for my decision tree or logistic regression classifiers.  With regards to decision trees, they do not produce a diagonal line, but rather give you a series of vertical and horizontal lines, meaning the scaling will not have a positive effect.  Further, regarding logistic / linear regression, my coefficients indicate the effect of a one-unit change in my predictor variable, meaning that the effect of scaling does not affect the classifier as my raw data and scaled data varied across the same number of units in both scenerios.
 
 *Feature Engineering*
-I felt that the features related to the email data were lacking in their targeting.  Primarily, I felt that the features, such as to_messages and from_messages were not meaningful as standalone features, but rather they should be centered around the relation with the POI.  Therefore, I created two new features, 'Ratio_from_POI' and 'Ratio_to_POI', which gave me a more well rounded glimpse of their relation to POIs.  These features, as mentioned above, did not score as well as some of the other financial features.  
+I felt that the features related to the email data were lacking in their targeting.  Primarily, I felt that the features, such as to_messages and from_messages were not meaningful as standalone features, but rather they should be centered around the relation with the POI.  Therefore, I created two new features, 'Ratio_from_POI' and 'Ratio_to_POI', which gave me a more well rounded glimpse of their relation to POIs.  These features were created to capture the ratio of emails were from / to a POI, with the numerator as the number of messages sent to / received from a poi and the denominator as the total messages for that person that were sent / received.  These help better understand the related interaction (through email communication) with any POI).
+
+These features, as mentioned above, did not score as well as some of the other financial features.  
 
 ### What algorithm did you end up using? What other one(s) did you try? How did model performance differ between algorithms?  [relevant rubric item: “pick an algorithm”]
 
@@ -115,7 +117,7 @@ GridSearchCV did much of the work, running all the variations of these parameter
 
 ### What is validation, and what’s a classic mistake you can make if you do it wrong? How did you validate your analysis?  [relevant rubric item: “validation strategy”]
 
-Validation ensures that an classifier generalizes well, meaning that the model, created from the data that the classifier is trained on, interprets and classifies and predicts the label for new data reasonably accurately.  The classic mistake is over-fitting your model, whereby the model is training on too much data (i.e., too many features), such that the model essentially memorizes the relation between training labels and training labels, but new data (or test data) is not generalized adequately. 
+Validation helps us understand how well a classifier generalizes.  Since the classifier based from the data that the classifier is trained on, we need some way to evaluate how the classifier generalizes and predicts labels for new data.  The classic mistake is over-fitting your model, whereby the model is training on too much data (i.e., too many features), such that the model essentially memorizes the relation between training labels and training labels, but new data (or test data) is not generalized adequately. 
 
 I purposefully chose to use the entire dataset for training the model.  The primary reason is that we have such limited data, in fact only 143 observations and approximately 20 features.  This is opposite of a norm of splitting the data into training and test datasets, training the model on the training data and validating that model against the test data that was held out of the data to train the model.  
 
@@ -145,6 +147,6 @@ With regards to my classifier, I was pleased with the results of my Naive Bayes 
 
 
 #### References: 
-- All sklean documentation pages for each tecnique and alogrithm utilized.
+- All sklearn documentation pages for each tecnique and alogrithm utilized.
 - https://discussions.udacity.com/t/GridSearchCV-and-testingtraining-data/36107
 - http://stackoverflow.com/questions/22903267/what-is-tuning-in-machine-learning 
