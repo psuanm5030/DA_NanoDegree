@@ -6,10 +6,11 @@
 
 
 import sys
-os.chdir("/Users/Miller/GitHub/DAnanodegree/Projects/P5_IdentifyFraudFromEnronEmail")
-sys.path.append("/Users/Miller/GitHub/DAnanodegree/Class4_Intro_ML/UD120/ud120-projects/tools")
-sys.path.append("/Users/Miller/GitHub/DAnanodegree/Class4_Intro_ML/UD120/ud120-projects/final_project")
-sys.path.append("/Users/Miller/GitHub/DAnanodegree/Projects/P5_IdentifyFraudFromEnronEmail")
+# os.chdir("/Users/Miller/GitHub/DAnanodegree/Projects/P5_IdentifyFraudFromEnronEmail")
+# sys.path.append("/Users/Miller/GitHub/DAnanodegree/Class4_Intro_ML/UD120/ud120-projects/tools")
+# sys.path.append("/Users/Miller/GitHub/DAnanodegree/Class4_Intro_ML/UD120/ud120-projects/final_project")
+# sys.path.append("/Users/Miller/GitHub/DAnanodegree/Projects/P5_IdentifyFraudFromEnronEmail")
+sys.path.append("../tools/")
 import os
 import operator
 from time import time
