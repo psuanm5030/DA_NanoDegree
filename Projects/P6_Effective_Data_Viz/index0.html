@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <title>Titanic Visualization - Fare and Age Survival</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <style type="text/css">
+    circle {
+      stroke: black;
+      stroke-width: 0.5;
+      opacity: 0.5;
+    }
+    h2 {
+          text-align: center;
+          color: red;
+        }
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: black;
+      shape-rendering: crispEdges;
+    }
+    
+    .axis text {
+      font-family: sans-serif;
+      font-size: 8px;
+    }
+    </style>
+  </head>
+  <body>
+    <script type='text/javascript'>
+
+      d3.csv("titanic_full.csv", function(d) {
+        return {
+          fare: +d.fare,
+          age: d.age == '' ? NaN : +d.age,
+          sibsp: +d.sibsp,
+          pclass: +d.pclass,
+          sex: d.sex,
+          name: d.name,
+          survived: d.survived
+
+        };
+      }, function(error, d) {
+        //Filter out erroneous age values (263 rows are removed)
+        var dataset = d.filter(function(d) {
+          if (d['age'] >= 0) {
+            return d;
+          }
+        });
+
+        //*MAIN ELEMENTS SETUP*
+        
+        //Width and height
+        var w = 1000;
+        var h = 750;
+        var z_upper = 8;
+        var z_lower = 3;
+        var padding = 20;
+
+        //Create scale functions
+        var xScale = d3.scale.linear()
+                   .domain([0, d3.max(dataset, function(d) { return d.fare; })])
+                   .range([padding, w - padding * 2]); // introduced this to make sure values are not cut off
+
+        var yScale = d3.scale.linear()
+                   .domain([0, d3.max(dataset, function(d) { return d.age; })])
+                   .range([h - padding, padding]);
+
+        var xAxis = d3.svg.axis()
+                  .scale(xScale)
+                  .orient("bottom");
+
+        var yAxis = d3.svg.axis()
+                  .scale(yScale)
+                  .orient("left");
+
+        //Create Title
+        d3.select('body')
+              .append('h2')
+              .text('Titanic Passengers')
+
+        //Create SVG element
+        var svg = d3.select("body")
+              .append("svg")
+              .attr("width", w)
+              .attr("height", h);
+
+          //Show Axes
+          svg.append('g')
+             .attr('class','x axis')
+             .attr('transform','translate(0,' + (h - padding)+')')
+             .call(xAxis);
+
+            svg.append('g')
+             .attr('class','y axis')
+             .attr('transform','translate(' + padding + ',0)')
+             .call(yAxis);
+
+            //Create Legend (there are two data elements created)
+            legend = svg.append("g")
+               .attr("class","legend")
+               .attr("transform", "translate(" + (w - 150) + "," + 15 + ")") //adding to top-right area
+               .selectAll("g")
+               .data(["Survived","Died"]) // returning two group elements
+               .style("font-size","1px")
+               .enter().append("g");
+
+              legend.append("circle")
+                .attr("cy", function(d,i) {
+                  console.log(i)
+                  return i * 20;
+                })
+                .attr("r", 5)
+                .attr("fill", function(d) {
+                  if (d == "Survived") {
+                    return 'blue';
+                  } else {
+                    return 'red';
+                  }
+                });
+
+              legend.append("text")
+                .attr("y", function(d,i) {
+                  return i * 20 + 5;
+                })
+                .attr("x", 5 * 5)
+                .text(function(d) {
+                  return d;
+                });
+
+            var circle = svg.selectAll('circle')
+                    .data(dataset)
+                    .enter()
+                    .append('circle')
+                    .attr('class','enter')
+                    .attr("cx", function(d) { return xScale(d.fare); })
+                    .attr("cy", function(d) { return yScale(d.age); })
+                    .attr("r", 5)
+                    .attr('fill', function(d) {
+                      if (d.survived === '0') 
+                        { return 'red'; } 
+                      else 
+                        { return 'blue'; }
+                      });
+              
+      });
+    </script>
+  </body>
+</html>
