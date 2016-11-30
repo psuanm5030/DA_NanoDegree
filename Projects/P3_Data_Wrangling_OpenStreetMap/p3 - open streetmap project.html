@@ -225,6 +225,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<hr>
 <h3 id="2.-Understanding-the-Data">2. Understanding the Data<a class="anchor-link" href="#2.-Understanding-the-Data">&#182;</a></h3><p>I spent nearly 6 hours working through the parsing scripts (from class) again, ensuring that I understood everything that was happening, however I believe I may have spent a similar amount of time exploring the data in MongoDB - through pipelines created in python (via pymongo package) and in the mongo shell.  Here is detail that I thought interesting from this exercise:</p>
 <h5 id="Overview-of-the-Pittsburgh-Dataset">Overview of the Pittsburgh Dataset<a class="anchor-link" href="#Overview-of-the-Pittsburgh-Dataset">&#182;</a></h5><ul>
 <li>Size of the file <blockquote><p>> db.pittsburgh.count() <br>
@@ -266,59 +267,95 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<hr>
 <h3 id="3.-Other-Ideas-about-this-Dataset">3. Other Ideas about this Dataset<a class="anchor-link" href="#3.-Other-Ideas-about-this-Dataset">&#182;</a></h3><p>Now I am having some fun with pipelines, including all the various pipeline operators.  These operations were performed in the Proj_1.3_Review.py script, using the pymongo package.  Here are some of the interesting ideas I had and the resulting conclusions I came to:</p>
-<ul>
-<li><p>#### Idea 1: I wanted to understand the amenities that had the most unique user creators. The reason for this was to guage the participation from the community and to understand what items motivated others to get involved.<br>
-<br><em>Pipeline Code:</em></p>
-<pre><code>def make_pipeline_tag_type_distinct_users():
-  pipeline = [{'$match':{'amenity':{'$exists':1}}},
-              {'$group':{'_id':{'amenity':'$amenity'},
-                         'users_distinct':{'$addToSet':'$created.user'}}},
-              {'$project':{'amenity':1,
-                           'users_distinct':{'$size':'$users_distinct'},
-                           'count_amenities':1}},
-              {'$sort':{'users_distinct':-1}},
-              {'$limit':10}]
-  return pipeline  </code></pre><p><p>_Results:_</p></p>
-<pre><code>
-[{u'_id': {u'amenity': u'restaurant'}, u'users_distinct': 147},
-{u'_id': {u'amenity': u'parking'}, u'users_distinct': 141},
-{u'_id': {u'amenity': u'school'}, u'users_distinct': 125},
-{u'_id': {u'amenity': u'place_of_worship'}, u'users_distinct': 121},
-{u'_id': {u'amenity': u'fuel'}, u'users_distinct': 78},
-{u'_id': {u'amenity': u'library'}, u'users_distinct': 73},
-{u'_id': {u'amenity': u'fast_food'}, u'users_distinct': 65},
-{u'_id': {u'amenity': u'bank'}, u'users_distinct': 57},
-{u'_id': {u'amenity': u'post_office'}, u'users_distinct': 55},
-{u'_id': {u'amenity': u'pharmacy'}, u'users_distinct': 53}]</code></pre></li>
-<li><p>#### Conclusion 1: I found that restaurants were number 1, with 147 unique users creating these tags.  This was of little surprise, as restuarants are constently opening / shutting down.  Maybe there are some owners that thought it was important to get their establishment listed within OSM data (obviously the more places your establishment is defined, the more traffic you can drive to your business).  Further, I imagine it is difficult for one user to cover them all, with the thought that regular contributors are not checking / editing to ensure restaurants are accurately reflected / updated.</p>
-</li>
-<li><p>#### Improvement 1: Below is a listing of 10 amenities that had only one tag within the data.  Knowing my city, I know that there are more than one trailer park or ev charinging station.<br>
-<br><em>Pipeline Code:</em></p>
-<pre><code>def make_pipeline_tag_type_distinct_users():
-  pipeline = [{'$match':{'amenity':{'$exists':1}}},
-              {'$group':{'_id':{'amenity':'$amenity'},
-                         'users_distinct':{'$addToSet':'$created.user'}}},
-              {'$project':{'amenity':1,
-                           'users_distinct':{'$size':'$users_distinct'},
-                           'count_amenities':1}},
-              {'$sort':{'users_distinct':1}},
-              {'$limit':10}]
-  return pipeline  </code></pre><p><p>_Results:_</p></p>
-<pre><code>
-[{u'_id': {u'amenity': u'trailer_park'}, u'users_distinct': 1},
-{u'_id': {u'amenity': u'gambling'}, u'users_distinct': 1},
-{u'_id': {u'amenity': u'shower'}, u'users_distinct': 1},
-{u'_id': {u'amenity': u'rental'}, u'users_distinct': 1},
-{u'_id': {u'amenity': u'storage'}, u'users_distinct': 1},
-{u'_id': {u'amenity': u'ev_charging'}, u'users_distinct': 1},
-{u'_id': {u'amenity': u'compressed_air'}, u'users_distinct': 1},
-{u'_id': {u'amenity': u'bleachers'}, u'users_distinct': 1},
-{u'_id': {u'amenity': u'education_centre'}, u'users_distinct': 1},
-{u'_id': {u'amenity': u'watering_place'}, u'users_distinct': 1}]</code></pre></li>
-<li><p>#### Improvement 1 (continued): How could we improve upon this?  My favorite idea is "gamification" - the practice of turning tasks (e.g., data entry for OSM data) into a game / contest - where users are rewarded with points for helping improve the quality and robustness of their data.  The points system would be wise to take into account amenities / areas that are not being well covered (e.g., increase the points offered for minimally covered amenities).  However, the points system should have some validation and monitoring, as some users may go to the extreme (and falsify entries to get points, especially items that award them more points).  It would be wise to implement a system to track and notify administrators of "fast-rising users" or users that present suspicious patterns of data entry (e.g., adding public toilets at a high right in a small area).**</p>
-</li>
-</ul>
+<h4 id="Idea-1:-I-wanted-to-understand-the-amenities-that-had-the-most-unique-user-creators.-The-reason-for-this-was-to-guage-the-participation-from-the-community-and-to-understand-what-items-motivated-others-to-get-involved.">Idea 1: I wanted to understand the amenities that had the most unique user creators. The reason for this was to guage the participation from the community and to understand what items motivated others to get involved.<a class="anchor-link" href="#Idea-1:-I-wanted-to-understand-the-amenities-that-had-the-most-unique-user-creators.-The-reason-for-this-was-to-guage-the-participation-from-the-community-and-to-understand-what-items-motivated-others-to-get-involved.">&#182;</a></h4><p><br><em>Pipeline Code:</em></p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">make_pipeline_tag_type_distinct_users</span><span class="p">():</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&#39;$match&#39;</span><span class="p">:{</span><span class="s">&#39;amenity&#39;</span><span class="p">:{</span><span class="s">&#39;$exists&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">}}},</span>
+                <span class="p">{</span><span class="s">&#39;$group&#39;</span><span class="p">:{</span><span class="s">&#39;_id&#39;</span><span class="p">:{</span><span class="s">&#39;amenity&#39;</span><span class="p">:</span><span class="s">&#39;$amenity&#39;</span><span class="p">},</span>
+                           <span class="s">&#39;users_distinct&#39;</span><span class="p">:{</span><span class="s">&#39;$addToSet&#39;</span><span class="p">:</span><span class="s">&#39;$created.user&#39;</span><span class="p">}}},</span>
+                <span class="p">{</span><span class="s">&#39;$project&#39;</span><span class="p">:{</span><span class="s">&#39;amenity&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="s">&#39;users_distinct&#39;</span><span class="p">:{</span><span class="s">&#39;$size&#39;</span><span class="p">:</span><span class="s">&#39;$users_distinct&#39;</span><span class="p">},</span>
+                             <span class="s">&#39;count_amenities&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">}},</span>
+                <span class="p">{</span><span class="s">&#39;$sort&#39;</span><span class="p">:{</span><span class="s">&#39;users_distinct&#39;</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">}},</span>
+                <span class="p">{</span><span class="s">&#39;$limit&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">}]</span>
+    <span class="k">return</span> <span class="n">pipeline</span>
+</pre></div>
+<p><em>Results:</em></p>
+<div class="highlight"><pre><span class="p">[{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;restaurant&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">147</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;parking&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">141</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;school&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">125</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;place_of_worship&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">121</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;fuel&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">78</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;library&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">73</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;fast_food&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">65</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;bank&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">57</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;post_office&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">55</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;pharmacy&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">53</span><span class="p">}]</span>
+</pre></div>
+<h4 id="Conclusion-1:-I-found-that-restaurants-were-number-1,-with-147-unique-users-creating-these-tags.--This-was-of-little-surprise,-as-restuarants-are-constently-opening-/-shutting-down.--Maybe-there-are-some-owners-that-thought-it-was-important-to-get-their-establishment-listed-within-OSM-data-(obviously-the-more-places-your-establishment-is-defined,-the-more-traffic-you-can-drive-to-your-business).--Further,-I-imagine-it-is-difficult-for-one-user-to-cover-them-all,-with-the-thought-that-regular-contributors-are-not-checking-/-editing-to-ensure-restaurants-are-accurately-reflected-/-updated.">Conclusion 1: I found that restaurants were number 1, with 147 unique users creating these tags.  This was of little surprise, as restuarants are constently opening / shutting down.  Maybe there are some owners that thought it was important to get their establishment listed within OSM data (obviously the more places your establishment is defined, the more traffic you can drive to your business).  Further, I imagine it is difficult for one user to cover them all, with the thought that regular contributors are not checking / editing to ensure restaurants are accurately reflected / updated.<a class="anchor-link" href="#Conclusion-1:-I-found-that-restaurants-were-number-1,-with-147-unique-users-creating-these-tags.--This-was-of-little-surprise,-as-restuarants-are-constently-opening-/-shutting-down.--Maybe-there-are-some-owners-that-thought-it-was-important-to-get-their-establishment-listed-within-OSM-data-(obviously-the-more-places-your-establishment-is-defined,-the-more-traffic-you-can-drive-to-your-business).--Further,-I-imagine-it-is-difficult-for-one-user-to-cover-them-all,-with-the-thought-that-regular-contributors-are-not-checking-/-editing-to-ensure-restaurants-are-accurately-reflected-/-updated.">&#182;</a></h4><h4 id="Improvement-1:-Below-is-a-listing-of-10-amenities-that-had-only-one-tag-within-the-data.--Knowing-my-city,-I-know-that-there-are-more-than-one-trailer-park-or-ev-charinging-station.">Improvement 1: Below is a listing of 10 amenities that had only one tag within the data.  Knowing my city, I know that there are more than one trailer park or ev charinging station.<a class="anchor-link" href="#Improvement-1:-Below-is-a-listing-of-10-amenities-that-had-only-one-tag-within-the-data.--Knowing-my-city,-I-know-that-there-are-more-than-one-trailer-park-or-ev-charinging-station.">&#182;</a></h4><p><br><em>Pipeline Code:</em></p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">make_pipeline_tag_type_distinct_users</span><span class="p">():</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&#39;$match&#39;</span><span class="p">:{</span><span class="s">&#39;amenity&#39;</span><span class="p">:{</span><span class="s">&#39;$exists&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">}}},</span>
+                <span class="p">{</span><span class="s">&#39;$group&#39;</span><span class="p">:{</span><span class="s">&#39;_id&#39;</span><span class="p">:{</span><span class="s">&#39;amenity&#39;</span><span class="p">:</span><span class="s">&#39;$amenity&#39;</span><span class="p">},</span>
+                           <span class="s">&#39;users_distinct&#39;</span><span class="p">:{</span><span class="s">&#39;$addToSet&#39;</span><span class="p">:</span><span class="s">&#39;$created.user&#39;</span><span class="p">}}},</span>
+                <span class="p">{</span><span class="s">&#39;$project&#39;</span><span class="p">:{</span><span class="s">&#39;amenity&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="s">&#39;users_distinct&#39;</span><span class="p">:{</span><span class="s">&#39;$size&#39;</span><span class="p">:</span><span class="s">&#39;$users_distinct&#39;</span><span class="p">},</span>
+                             <span class="s">&#39;count_amenities&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">}},</span>
+                <span class="p">{</span><span class="s">&#39;$sort&#39;</span><span class="p">:{</span><span class="s">&#39;users_distinct&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">}},</span>
+                <span class="p">{</span><span class="s">&#39;$limit&#39;</span><span class="p">:</span><span class="mi">10</span><span class="p">}]</span>
+    <span class="k">return</span> <span class="n">pipeline</span>
+</pre></div>
+<p><em>Results:</em></p>
+<div class="highlight"><pre><span class="p">[{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;trailer_park&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;gambling&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;shower&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;rental&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;storage&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;ev_charging&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;compressed_air&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;bleachers&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;education_centre&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;amenity&#39;</span><span class="p">:</span> <span class="s">u&#39;watering_place&#39;</span><span class="p">},</span> <span class="s">u&#39;users_distinct&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}]</span>
+</pre></div>
+<h4 id="Improvement-1-(continued):-How-could-we-improve-upon-this?--My-favorite-idea-is-&quot;gamification&quot;---the-practice-of-turning-tasks-(e.g.,-data-entry-for-OSM-data)-into-a-game-/-contest---where-users-are-rewarded-with-points-for-helping-improve-the-quality-and-robustness-of-their-data.--The-points-system-would-be-wise-to-take-into-account-amenities-/-areas-that-are-not-being-well-covered-(e.g.,-increase-the-points-offered-for-minimally-covered-amenities).--However,-the-points-system-should-have-some-validation-and-monitoring,-as-some-users-may-go-to-the-extreme-(and-falsify-entries-to-get-points,-especially-items-that-award-them-more-points).--It-would-be-wise-to-implement-a-system-to-track-and-notify-administrators-of-&quot;fast-rising-users&quot;-or-users-that-present-suspicious-patterns-of-data-entry-(e.g.,-adding-public-toilets-at-a-high-right-in-a-small-area).**">Improvement 1 (continued): How could we improve upon this?  My favorite idea is "gamification" - the practice of turning tasks (e.g., data entry for OSM data) into a game / contest - where users are rewarded with points for helping improve the quality and robustness of their data.  The points system would be wise to take into account amenities / areas that are not being well covered (e.g., increase the points offered for minimally covered amenities).  However, the points system should have some validation and monitoring, as some users may go to the extreme (and falsify entries to get points, especially items that award them more points).  It would be wise to implement a system to track and notify administrators of "fast-rising users" or users that present suspicious patterns of data entry (e.g., adding public toilets at a high right in a small area).**<a class="anchor-link" href="#Improvement-1-(continued):-How-could-we-improve-upon-this?--My-favorite-idea-is-&quot;gamification&quot;---the-practice-of-turning-tasks-(e.g.,-data-entry-for-OSM-data)-into-a-game-/-contest---where-users-are-rewarded-with-points-for-helping-improve-the-quality-and-robustness-of-their-data.--The-points-system-would-be-wise-to-take-into-account-amenities-/-areas-that-are-not-being-well-covered-(e.g.,-increase-the-points-offered-for-minimally-covered-amenities).--However,-the-points-system-should-have-some-validation-and-monitoring,-as-some-users-may-go-to-the-extreme-(and-falsify-entries-to-get-points,-especially-items-that-award-them-more-points).--It-would-be-wise-to-implement-a-system-to-track-and-notify-administrators-of-&quot;fast-rising-users&quot;-or-users-that-present-suspicious-patterns-of-data-entry-(e.g.,-adding-public-toilets-at-a-high-right-in-a-small-area).**">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<hr>
+<h4 id="Idea-2:-After-investigating-all-the-amenities-noted,-I-noticed-there-were-three-(3)-casinos-noted,-so-I-wanted-to-find-out-which-ones.-I-wanted-to-validate-my-knowledge!">Idea 2: After investigating all the amenities noted, I noticed there were three (3) casinos noted, so I wanted to find out which ones. I wanted to validate my knowledge!<a class="anchor-link" href="#Idea-2:-After-investigating-all-the-amenities-noted,-I-noticed-there-were-three-(3)-casinos-noted,-so-I-wanted-to-find-out-which-ones.-I-wanted-to-validate-my-knowledge!">&#182;</a></h4><p><br><em>Pipeline Code:</em></p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">make_pipeline_amenity_casino</span><span class="p">():</span>
+    <span class="c"># Purpose: Investigate the 3 casinos that were noted.  This shows the names of the casinos that were noted.</span>
+    <span class="c"># This is of interest as the casino industry is relatively new in Pittsburgh and there are two major</span>
+    <span class="c"># casinos: Rivers Casino and The Meadows Casino and Racetrack.</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&#39;$match&#39;</span><span class="p">:{</span><span class="s">&#39;amenity&#39;</span><span class="p">:</span><span class="s">&#39;casino&#39;</span><span class="p">}},</span>
+                <span class="p">{</span><span class="s">&#39;$project&#39;</span><span class="p">:{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="s">&#39;_id&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+                             <span class="s">&#39;address&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">}}]</span>
+    <span class="k">return</span> <span class="n">pipeline</span>
+</pre></div>
+<p><em>Results:</em></p>
+<div class="highlight"><pre><span class="p">[{</span><span class="s">u&#39;address&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;city&#39;</span><span class="p">:</span> <span class="s">u&#39;Pittsburgh&#39;</span><span class="p">,</span>
+               <span class="s">u&#39;housenumber&#39;</span><span class="p">:</span> <span class="s">u&#39;777&#39;</span><span class="p">,</span>
+               <span class="s">u&#39;postcode&#39;</span><span class="p">:</span> <span class="s">u&#39;15233&#39;</span><span class="p">,</span>
+               <span class="s">u&#39;state&#39;</span><span class="p">:</span> <span class="s">u&#39;PA&#39;</span><span class="p">,</span>
+               <span class="s">u&#39;street&#39;</span><span class="p">:</span> <span class="s">u&#39;Casino Drive&#39;</span><span class="p">},</span>
+  <span class="s">u&#39;name&#39;</span><span class="p">:</span> <span class="s">u&#39;Rivers Casino&#39;</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;name&#39;</span><span class="p">:</span> <span class="s">u&#39;Mountaineer Casino&#39;</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;name&#39;</span><span class="p">:</span> <span class="s">u&#39;Mountaineer Casino, Racetrack and Resort&#39;</span><span class="p">}]</span>
+</pre></div>
+<h4 id="Conclusion-2:-When-I-saw-the-listing-of-casinos-noted,-I-was-immediately-surprised.--I-expected:-Rivers-Casino,-Moutaineer-Casino-(actually-in-West-Virginia)-and-the-Meadows-Racetrack-Casino.-The-Meadows-Racetrack-Casino-was-not-listed-and-the-Mountaineer-Casino-was-listed-twice,-under-two-similar-names.--There-were-two-issues-here:">Conclusion 2: When I saw the listing of casinos noted, I was immediately surprised.  I expected: Rivers Casino, Moutaineer Casino (actually in West Virginia) and the Meadows Racetrack Casino. The Meadows Racetrack Casino was not listed and the Mountaineer Casino was listed twice, under two similar names.  There were two issues here:<a class="anchor-link" href="#Conclusion-2:-When-I-saw-the-listing-of-casinos-noted,-I-was-immediately-surprised.--I-expected:-Rivers-Casino,-Moutaineer-Casino-(actually-in-West-Virginia)-and-the-Meadows-Racetrack-Casino.-The-Meadows-Racetrack-Casino-was-not-listed-and-the-Mountaineer-Casino-was-listed-twice,-under-two-similar-names.--There-were-two-issues-here:">&#182;</a></h4>
+<pre><code>- The "Mountaineer" entries seem to be duplicates and "The Meadows Casino and Racetrack" wasnt listed! 
+- There is no address detail for the last two (Mountaineer Casino and Mountaineer Casino, Racetrack and Resort).  This further prevented me from understanding whether someone named the "Mountaineer Casino, Racetrack and Resort" wrong (when it could be "Meadows Casino, Racetrack and Resort" (that was a longshot).  But most importantly, the detail wasnt there (and probably should be). 
+
+</code></pre>
+<h4 id="Improvement-2:-These-situations-could-be-improved-in-two-distinct-ways:">Improvement 2: These situations could be improved in two distinct ways:<a class="anchor-link" href="#Improvement-2:-These-situations-could-be-improved-in-two-distinct-ways:">&#182;</a></h4>
+<pre><code>- 1) Add an algorithm to detect potential duplicates.  One of my favorite packages for reviewing for duplicates is fuzzywuzzy [link to github repo](https://github.com/seatgeek/fuzzywuzzy).  This allows you to perform duplicate searching using the following fuzzy matching methods: Levenshtein distance, token sort, and token set. These functions generate scores (e.g., 90 / 100 potential match), which could be reviewed.  This would likely have noted the 'Mountaineer Casino' &amp; 'Mountaineer Casino, Racetrack and Resort' items for review by an administrator (would have been scored 100 on the token set method). 
+- 2) Second, and much more advanced, there could be some checking with other external sources, such as Yelp or Google, via their API.  This could be done in a basic way, building on the gamification theme presented above, where areas of a map are compared with yelp or google via their APIs (e.g., compare the number of restaurants), where shortfalls in the OSM data leads to campaigns to improve the data in that area.  Users would received a multiple (e.g., 2X or 4X) of the standard amount of points for entering data.</code></pre>
 
 </div>
 </div>
@@ -328,76 +365,30 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<ul>
-<li><p>#### Idea 2: After investigating all the amenities noted, I noticed there were three (3) casinos noted, so I wanted to find out which ones. I wanted to validate my knowledge! 
-<br><em>Pipeline Code:</em></p>
-<pre><code>def make_pipeline_amenity_casino():
-  # Purpose: Investigate the 3 casinos that were noted.  This shows the names of the casinos that were noted.
-  # This is of interest as the casino industry is relatively new in Pittsburgh and there are two major
-  # casinos: Rivers Casino and The Meadows Casino and Racetrack.
-  pipeline = [{'$match':{'amenity':'casino'}},
-              {'$project':{'name':1,
-                           '_id':0,
-                           'address':1}}]
-  return pipeline</code></pre><p><p>_Results:_</p></p>
-<pre><code>
-[{u'address': {u'city': u'Pittsburgh',
-             u'housenumber': u'777',
-             u'postcode': u'15233',
-             u'state': u'PA',
-             u'street': u'Casino Drive'},
-u'name': u'Rivers Casino'},
-{u'name': u'Mountaineer Casino'},
-{u'name': u'Mountaineer Casino, Racetrack and Resort'}]</code></pre></li>
-<li><p>#### Conclusion 2: When I saw the listing of casinos noted, I was immediately surprised.  I expected: Rivers Casino, Moutaineer Casino (actually in West Virginia) and the Meadows Racetrack Casino. The Meadows Racetrack Casino was not listed and the Mountaineer Casino was listed twice, under two similar names.  There were two issues here:</p>
-<ul>
-<li>The "Mountaineer" entries seem to be duplicates and "The Meadows Casino and Racetrack" wasnt listed! </li>
-<li>There is no address detail for the last two (Mountaineer Casino and Mountaineer Casino, Racetrack and Resort).  This further prevented me from understanding whether someone named the "Mountaineer Casino, Racetrack and Resort" wrong (when it could be "Meadows Casino, Racetrack and Resort" (that was a longshot).  But most importantly, the detail wasnt there (and probably should be). </li>
-</ul>
-</li>
-<li><p>#### Improvement 2: These situations could be improved in two distinct ways:</p>
-<ul>
-<li>1) Add an algorithm to detect potential duplicates.  One of my favorite packages for reviewing for duplicates is fuzzywuzzy <a href="https://github.com/seatgeek/fuzzywuzzy">link to github repo</a>.  This allows you to perform duplicate searching using the following fuzzy matching methods: Levenshtein distance, token sort, and token set. These functions generate scores (e.g., 90 / 100 potential match), which could be reviewed.  This would likely have noted the 'Mountaineer Casino' &amp; 'Mountaineer Casino, Racetrack and Resort' items for review by an administrator (would have been scored 100 on the token set method). </li>
-<li>2) Second, and much more advanced, there could be some checking with other external sources, such as Yelp or Google, via their API.  This could be done in a basic way, building on the gamification theme presented above, where areas of a map are compared with yelp or google via their APIs (e.g., compare the number of restaurants), where shortfalls in the OSM data leads to campaigns to improve the data in that area.  Users would received a multiple (e.g., 2X or 4X) of the standard amount of points for entering data.</li>
-</ul>
-</li>
-</ul>
+<hr>
+<h4 id="Idea-3:-I-also-wanted-to-check-out-the-postal-codes-that-I-have-lived-in!--Below-is-the-code-I-used-to-find-only-those-items-for-the-two-post-codes-(15317-and-15222).">Idea 3: I also wanted to check out the postal codes that I have lived in!  Below is the code I used to find only those items for the two post codes (15317 and 15222).<a class="anchor-link" href="#Idea-3:-I-also-wanted-to-check-out-the-postal-codes-that-I-have-lived-in!--Below-is-the-code-I-used-to-find-only-those-items-for-the-two-post-codes-(15317-and-15222).">&#182;</a></h4><p><br><em>Pipeline Code:</em></p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">make_pipeline_postal_specific</span><span class="p">():</span>
+    <span class="c"># Further investigate the cities for a list of specific postal codes (where I have lived).</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&#39;$match&#39;</span><span class="p">:{</span><span class="s">&#39;address.postcode&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;$in&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;15317&#39;</span><span class="p">,</span> <span class="s">&#39;15222&#39;</span><span class="p">]</span> <span class="p">}}},</span>
+                <span class="p">{</span><span class="s">&#39;$group&#39;</span><span class="p">:{</span><span class="s">&#39;_id&#39;</span><span class="p">:{</span><span class="s">&#39;postcode&#39;</span><span class="p">:</span><span class="s">&#39;$address.postcode&#39;</span><span class="p">,</span><span class="s">&#39;city&#39;</span><span class="p">:</span><span class="s">&#39;$address.city&#39;</span><span class="p">},</span>
+                           <span class="s">&#39;count&#39;</span><span class="p">:{</span><span class="s">&#39;$sum&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">}}},</span>
+                <span class="p">{</span><span class="s">&#39;$sort&#39;</span><span class="p">:{</span><span class="s">&#39;count&#39;</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">}}]</span>
+    <span class="k">return</span> <span class="n">pipeline</span>
+</pre></div>
+<p><em>Results:</em></p>
+<div class="highlight"><pre><span class="p">[{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;city&#39;</span><span class="p">:</span> <span class="s">u&#39;Canonsburg&#39;</span><span class="p">,</span> <span class="s">u&#39;postcode&#39;</span><span class="p">:</span> <span class="s">u&#39;15317&#39;</span><span class="p">},</span> <span class="s">u&#39;count&#39;</span><span class="p">:</span> <span class="mi">2424</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;postcode&#39;</span><span class="p">:</span> <span class="s">u&#39;15317&#39;</span><span class="p">},</span> <span class="s">u&#39;count&#39;</span><span class="p">:</span> <span class="mi">284</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;city&#39;</span><span class="p">:</span> <span class="s">u&#39;Pittsburgh&#39;</span><span class="p">,</span> <span class="s">u&#39;postcode&#39;</span><span class="p">:</span> <span class="s">u&#39;15222&#39;</span><span class="p">},</span> <span class="s">u&#39;count&#39;</span><span class="p">:</span> <span class="mi">253</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;postcode&#39;</span><span class="p">:</span> <span class="s">u&#39;15222&#39;</span><span class="p">},</span> <span class="s">u&#39;count&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+ <span class="p">{</span><span class="s">u&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">u&#39;city&#39;</span><span class="p">:</span> <span class="s">u&#39;McMurray&#39;</span><span class="p">,</span> <span class="s">u&#39;postcode&#39;</span><span class="p">:</span> <span class="s">u&#39;15317&#39;</span><span class="p">},</span> <span class="s">u&#39;count&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}]</span>
+</pre></div>
+<h4 id="Conclusion-3:-This-presents-another-shortfall-of-the-OSM-data.">Conclusion 3: This presents another shortfall of the OSM data.<a class="anchor-link" href="#Conclusion-3:-This-presents-another-shortfall-of-the-OSM-data.">&#182;</a></h4>
+<pre><code>- First I didnt return two (2) results, but four (4).  This means that 284 (for post code 15317) &amp; 4 elements (for post code 15222) didnt have the associated city name.  
+- Second: Post code 15222 is a more prominent zip code in the city of pittsburgh (I lived in Shadyside at one point - a very hip area to live in), but it had less items than 15317.  Yes, I understand that 15317 probably covers more area, but I was still surprised, as there is a great number of amenities within 15222 (restaurants, shops, business, hospitals).  
+- Finally: If I had more time and curiosity, I would want to investigate just how significant this thought is (whats the area covered by each post code).  That will be for another time!
 
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<ul>
-<li><p>#### Idea 3: I also wanted to check out the postal codes that I have lived in!  Below is the code I used to find only those items for the two post codes (15317 and 15222).<br>
-<br><em>Pipeline Code:</em></p>
-<pre><code>def make_pipeline_postal_specific():
-  # Further investigate the cities for a list of specific postal codes (where I have lived).
-  pipeline = [{'$match':{'address.postcode': {'$in': ['15317', '15222'] }}},
-              {'$group':{'_id':{'postcode':'$address.postcode','city':'$address.city'},
-                         'count':{'$sum':1}}},
-              {'$sort':{'count':-1}}]
-  return pipeline</code></pre><p><p>_Results:_</p></p>
-<pre><code>
-[{u'_id': {u'city': u'Canonsburg', u'postcode': u'15317'}, u'count': 2424},
-{u'_id': {u'postcode': u'15317'}, u'count': 284},
-{u'_id': {u'city': u'Pittsburgh', u'postcode': u'15222'}, u'count': 253},
-{u'_id': {u'postcode': u'15222'}, u'count': 4},
-{u'_id': {u'city': u'McMurray', u'postcode': u'15317'}, u'count': 1}]</code></pre></li>
-<li><p>#### Conclusion 3: This presents another shortfall of the OSM data.</p>
-<ul>
-<li>First I didnt return two (2) results, but four (4).  This means that 284 (for post code 15317) &amp; 4 elements (for post code 15222) didnt have the associated city name.  </li>
-<li>Second: Post code 15222 is a more prominent zip code in the city of pittsburgh (I lived in Shadyside at one point - a very hip area to live in), but it had less items than 15317.  Yes, I understand that 15317 probably covers more area, but I was still surprised, as there is a great number of amenities within 15222 (restaurants, shops, business, hospitals).  </li>
-<li>Finally: If I had more time and curiosity, I would want to investigate just how significant this thought is (whats the area covered by each post code).  That will be for another time!</li>
-</ul>
-</li>
-<li><p>#### Improvement 3: I will conclude with strengthening my gamification point of view here - noting this is another situation which could be improved through this approach.  An alogrithm could easily be developed which identifies complimentary data which is not complete (e.g., postcode without a city, restaurant without a "cuisine" tag, etc.).  Users could be rewarded with points for filling in these missing data points.</p>
-</li>
-</ul>
-
+</code></pre>
+<h4 id="Improvement-3:-I-will-conclude-with-strengthening-my-gamification-point-of-view-here---noting-this-is-another-situation-which-could-be-improved-through-this-approach.--An-alogrithm-could-easily-be-developed-which-identifies-complimentary-data-which-is-not-complete-(e.g.,-postcode-without-a-city,-restaurant-without-a-&quot;cuisine&quot;-tag,-etc.).--Users-could-be-rewarded-with-points-for-filling-in-these-missing-data-points.">Improvement 3: I will conclude with strengthening my gamification point of view here - noting this is another situation which could be improved through this approach.  An alogrithm could easily be developed which identifies complimentary data which is not complete (e.g., postcode without a city, restaurant without a "cuisine" tag, etc.).  Users could be rewarded with points for filling in these missing data points.<a class="anchor-link" href="#Improvement-3:-I-will-conclude-with-strengthening-my-gamification-point-of-view-here---noting-this-is-another-situation-which-could-be-improved-through-this-approach.--An-alogrithm-could-easily-be-developed-which-identifies-complimentary-data-which-is-not-complete-(e.g.,-postcode-without-a-city,-restaurant-without-a-&quot;cuisine&quot;-tag,-etc.).--Users-could-be-rewarded-with-points-for-filling-in-these-missing-data-points.">&#182;</a></h4>
 </div>
 </div>
 </div>
