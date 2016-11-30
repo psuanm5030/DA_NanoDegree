@@ -1,7 +1,7 @@
 
 ## P1: Test a Perceptual Phenomenon
 ### Student: Andy Miller
-#### O 21st 2015
+#### October 21st 2015
 
 
 ```python
