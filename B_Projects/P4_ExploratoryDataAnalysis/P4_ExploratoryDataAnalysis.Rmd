@@ -2,7 +2,7 @@
 title: "Red Wine Quality EDA"
 author: "AndyMiller"
 date: "January 24, 2016"
-output: html_document
+output: pdf_document
 ---
 
 # Overall
@@ -40,7 +40,7 @@ library(Hmisc)
 ## Importation of Dataset
 ```{r Import Data with Initial Prep}
 # Import the Red Wine Quality dataset
-rw <- read.csv('/Users/Miller/GitHub/DAnanodegree/Projects/P4_ExploratoryDataAnalysis/reds.csv', 
+rw <- read.csv('/Users/Miller/GitHub/DAnanodegree/B_Projects/P4_ExploratoryDataAnalysis/reds.csv', 
                sep = ',', 
                colClasses = c('character','numeric','numeric','numeric',
                               'numeric','numeric','numeric','numeric',
