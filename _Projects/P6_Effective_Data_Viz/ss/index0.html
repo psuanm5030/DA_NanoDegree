@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+		<meta charset='utf-8'>
+		<title>D3 Test</title>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<style type="text/css">
+		
+			div.bar {
+				display: inline-block;
+				width: 20px;
+				height: 75px;
+				margin-right: 2px;
+				background-color: teal;
+			}
+		
+		</style>
+	</head>
+	<body>
+		<script type='text/javascript'>
+			
+			//Data Visualization
+			function generateViz(dataset) {
+				d3.select('body').selectAll('p')
+					.data(dataset)
+					.enter()
+					.append('div')
+					.attr('class','bar')
+					.style('height', function(d) {
+						return d.name.length + 'px';
+					});
+			}
+
+			//Data Loading
+			//var dataset = [5,10,15,20,25]
+			var dataset; //Declare global variable
+			d3.csv('titanic_full.csv', function(data) {
+				dataset = data; // Handoff to global var
+				// Call the visualization function
+				generateViz(dataset);
+			});
+			
+		</script>
+	</body>
+</html>

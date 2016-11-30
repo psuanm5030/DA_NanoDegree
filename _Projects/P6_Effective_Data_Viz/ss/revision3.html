@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Pie layout</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="http://code.jquery.com/jquery.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+		<style type="text/css">
+        div.header {
+              text-align: center;
+              color: gray;
+        }
+        div.chart {
+              text-align: center;
+              padding-top: 40px;
+        }
+        .bar rect {
+		  fill: steelblue;
+		}
+
+		.bar text {
+		  fill: white;
+		  font: 10px sans-serif;
+		  text-anchor: end;
+		}
+		</style>
+	</head>
+	<div class="header" id="title"></div>
+	<div class="header" id="subtitle"></div>
+	<div class="chart" id="area1"></div>
+	<div class="chart" id="area2"></div>
+	<div class="chart" id="area3"></div>
+	
+	<body>
+		<script type="text/javascript">
+
+		//** Main Elements **
+	      //Create Title
+	      d3.select('#title')
+	        .append('h1')
+	        .html('Titanic Passenger Survival')
+
+  	      //Create Commentary
+	      d3.select('#subtitle')
+	        .append('p')
+	        .text('Andy Miller | Data Analyst Nanodegree| May 2016')
+
+	    function viz(pieData, barData, tileData) {
+
+	      function pieDraw(data) {
+	        //Width and height
+	        var w = 400,
+	            h = 400,
+	            r = Math.min(w,h) / 2;
+
+	        var color = d3.scale.ordinal()
+	            .range(['pink','lightblue']);
+
+	        var types = [' Died',' Survived']
+
+	        var outerRadius = Math.min(w,h) / 2;
+	        var innerRadius = 0;
+	        var arc = d3.svg.arc()
+	            .outerRadius(outerRadius)
+	            .innerRadius(innerRadius);
+
+	        var pie = d3.layout.pie()
+	            .sort(null)
+	            .value(function(d) {return d.values.count; });
+
+	        var chart1 = d3.select('#area1').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+	        var arcs = chart1.selectAll('g.arc')
+	                   .data(pie(data))
+	                 .enter().append('g')
+	                   .attr('class','arc')
+	                   .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+	        arcs.append('path')
+	          .attr('d',arc)
+	          .style('fill',function(d,i) {return color(i); });
+
+	        arcs.append('text')
+	          .attr("transform", function(d) {
+	            return "translate(" + arc.centroid(d) + ")";
+	          })
+	          .attr("text-anchor", "middle")
+	         .text(function(d,i) { return  d.value + types[i]; });
+
+	      }
+
+	      function barDraw(data) {
+	      	console.log('draw 2 initiated')
+
+	      	var w = 400,
+	      		h = 100,
+			    barHeight = 30;
+
+			var x = d3.scale.linear()
+			    .range([0, w])
+			    .domain([0, d3.max(data, function(d) { return +d.values.count; })]);
+
+	        var chart2 = d3.select('#area2').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+		    var bars = chart2.selectAll("g")
+		        .data(data)
+		      .enter().append("g")
+		        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; })
+		        .attr('class','bar');
+
+		    bars.append("rect")
+		        .attr("width", function(d) { return x(+d.values.count); })
+		        .attr("height", barHeight - 1);
+
+		    bars.append("text")
+		        .attr("x", function(d) { return x(+d.values.count) - 3; })
+		        .attr("y", barHeight / 2)
+		        .attr("dy", ".35em")
+		        .text(function(d) { return d.key.toUpperCase() + " - " + d.values.count; });
+
+	      };
+
+	      function tilesDraw(data) {
+	      	console.log('draw 3 initiated')
+
+	      	// var tData = data.function(d,i) {
+		      //   console.log(i);
+		      //   return {
+		      //     fare: +d.fare,
+		      //     age: d.age == '' ? NaN : +d.age,
+		      //     sibsp: +d.sibsp,
+		      //     pclass: +d.pclass,
+		      //     sex: d.sex,
+		      //     name: d.name,
+		      //     survived: d.survived,
+		      //     col: i % numPerRow,
+		      //     x: d.col * (squareSize + squarePad),
+		      //     row: Math.floor(i / numPerRow),
+		      //     y: d.row * (squareSize + squarePad)
+		      //   };
+	       //  }
+
+	        var w = 400,
+	      		h = 400;
+
+	      	// Sizing for the grid visualization
+			squareSize = 6;
+			squarePad = 2;
+			numPerRow = w / (squareSize + squarePad);
+
+			var tData = parseTileData(data);
+			// Sort the Data by survived status
+			// tData = tData.sort(function(a, b){return (+a.survived) - (+b.survived)});
+
+
+			var chart3 = d3.select('#area3').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+		    var squares = chart3.selectAll("g")
+		    		.data(tData);
+		    	  // .data(tData.sort(function(a,b) { return  +b['survived'] - +a['survived'];}));
+
+		    squares.enter()
+			      .append("rect")
+			      .attr("width", squareSize)
+			      .attr("height", squareSize)
+			      .attr("fill", function(d) {if (d.survived == '1') {return 'blue';} else {return 'red';}})
+			      .classed("square", true)
+			      // .classed("fill-square", function(d) { return d.filler; })
+			      .attr("x", function(d) { return d.x;})
+			      .attr("y", function(d) { return d.y;})
+			      .attr("opacity", 1);
+
+	      };
+
+	    pieDraw(pieData);  // Initiate the pie drawing
+	    barDraw(barData);  // Initiate the bar drawing
+	    tilesDraw(tileData); //Initiative the tiles drawing
+
+	    // Interactive elements
+		};
+
+	      function getPieData(data) {
+	        return  d3.nest()
+	                    .key(function(d) {return d.survived;})
+	                    .sortKeys(d3.ascending)
+	                    .rollup(function(d) {
+	                      return {
+	                        survived: d3.min(d,function(g) {return +g.survived;}),
+	                        count: d.length
+	                      };
+	                      })
+	                    .entries(data)
+	      };
+
+	      function getBarData(data) {
+	        return  d3.nest()
+	                    .key(function(d) {return d.sex;})
+	                    .sortKeys(d3.ascending)
+	                    .rollup(function(d) {
+	                      return {
+	                        sex: d3.min(d,function(g) {return g.sex;}),
+	                        count: d.length
+	                      };
+	                      })
+	                    .entries(data)
+	      };
+
+	      // function getAllData(d) {
+	      // 		//Return all the data that is needed
+	      //   	return {
+		     //      fare: +d.fare,
+		     //      age: d.age == '' ? NaN : +d.age,
+		     //      sibsp: +d.sibsp,
+		     //      pclass: +d.pclass,
+		     //      sex: d.sex,
+		     //      name: d.name,
+		     //      survived: d.survived
+		     //    }
+	      // };
+
+	      function getAllData(data) {
+	      	var new_data1 = data.map(function(d) {
+	      		return {
+	      		  fare: +d.fare,
+		          age: d.age == '' ? NaN : +d.age,
+		          sibsp: +d.sibsp,
+		          pclass: +d.pclass,
+		          sex: d.sex,
+		          name: d.name,
+		          survived: d.survived
+		      };
+		  	});
+
+	      	return new_data1;
+	      };
+
+
+/// CANNOT FIGURE OUT HOW TO GET DATA IN THE RIGHT FORMAT FOR THE TILE CHART.   
+	     //  function getTileData(rawdata) {
+		    // return data.map(function(d,i) {
+		    //   // positioning for square visual
+		    //   // stored here to make it easier
+		    //   // to keep track of.
+		    //   d.col = i % numPerRow;
+		    //   d.x = d.col * (squareSize + squarePad);
+		    //   d.row = Math.floor(i / numPerRow);
+		    //   d.y = d.row * (squareSize + squarePad);
+		    //   return d;
+		    // });
+	     //  };
+
+
+	      function parseTileData(rawdata) {
+	      	rawdata = rawdata.sort(function(a, b){return (+a.survived) - (+b.survived)});
+	      	var new_data2 = rawdata.map(function(d,i) { 
+	      		d.col = i % numPerRow;
+	      		d.x = d.col * (squareSize + squarePad);
+	      		d.row = Math.floor(i / numPerRow);
+	      		d.y = d.row * (squareSize + squarePad);
+	      		return d;
+	      	});
+
+	      	return new_data2;
+	      };
+
+	      function display(data) {
+	        var surv_data = getPieData(data);
+	        
+
+	        var sex_data = getBarData(data);
+
+	        var tile_data = getAllData(data);
+	        // var tile_data = getTileData(data);
+	        
+	        viz(surv_data, sex_data, tile_data);
+	      };
+
+	      // load data and display
+	      d3.csv("titanic_full.csv",display);
+						
+		</script>
+	</body>
+</html>

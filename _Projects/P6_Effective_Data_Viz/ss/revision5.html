@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Pie layout</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="http://code.jquery.com/jquery.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+		<style type="text/css">
+        div.header {
+              text-align: center;
+              color: gray;
+        }
+        div.chart {
+              text-align: center;
+              padding-top: 40px;
+        }
+        .barSurvived rect {
+		  fill: lightblue;
+		}
+		.barDied rect {
+		  fill: pink;
+		}
+		.barAll rect {
+		  fill: blue;
+		}
+		.barSurvived text {
+		  fill: black;
+		  font: 10px sans-serif;
+		  /*text-anchor: start;*/
+		}
+
+		.barDied text {
+		  fill: black;
+		  font: 10px sans-serif;
+		  /*text-anchor: start;*/
+		}
+		.barAll text {
+		  fill: black;
+		  font: 10px sans-serif;
+		  /*text-anchor: start;*/
+		}
+        div.tooltip { 
+            position: absolute;     
+            text-align: left;     
+            width: 250px;         
+            height: 100px;         
+            padding: 3px;       
+            font: 11px sans-serif;    
+            background: white;  
+            border: 0px;    
+            border-radius: 8px;     
+            pointer-events: none;
+        }
+		</style>
+	</head>
+	<div class="header" id="title"></div>
+	<div class="header" id="subtitle"></div>
+	<div class="chart" id="area1_title"></div>
+	<div class="chart" id="area1"></div>
+	<div class="chart" id="area2"></div>
+	<div class="chart" id="area3"></div>
+	<div class="chart" id="area4"></div>
+	
+	<body>
+		<script type="text/javascript">
+
+		//** Main Elements **
+	      //Create Title
+	      d3.select('#title')
+	        .append('h1')
+	        .html('Titanic Passenger Survival')
+
+  	      //Create Commentary
+	      d3.select('#subtitle')
+	        .append('p')
+	        .text('Andy Miller | Data Analyst Nanodegree | May 2016')
+
+	      //Create Area1 - Title
+	      d3.select('#area1_title')
+	        .append('p')
+	        .html('Ttesting')
+
+	      // Define the div for the tooltip
+	      var div = d3.select("body").append("div") 
+	                  .attr("class", "tooltip")       
+	                  .style("opacity", 0);
+
+	    function viz(all_data) {
+
+	      function pieDraw_All(data) {
+
+          	data = getPieData(data);
+
+	        //Update Survived Percentages
+	        died = data[0].values['count'];
+	        survived = data[1].values['count'];
+	        survived_perc = d3.round(d3.round((survived / (survived + died)),3)*100,1)
+	        died_perc = d3.round(d3.round((died / (survived + died)),3)*100,1)
+ 
+	        //Width and height
+	        var w = 200,
+	            h = 200,
+	            padd = 20,
+	            r = Math.min(w-padd,h-padd) / 2;
+
+	        var color = d3.scale.ordinal()
+	            .range(['pink','lightblue']);
+
+	        var types = [' Died',' Survived']
+
+	        var outerRadius = Math.min(w-padd,h-padd) / 2;
+	        var innerRadius = 0;
+	        var arc = d3.svg.arc()
+	            .outerRadius(outerRadius)
+	            .innerRadius(innerRadius);
+
+	        var pie = d3.layout.pie()
+	            .sort(null)
+	            .value(function(d) {return d.values.count; });
+
+	        var chart1 = d3.select('#area1').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+	        var arcs = chart1.selectAll('g.arc')
+	                   .data(pie(data))
+	                 .enter().append('g')
+	                   .attr('class','arc')
+	                   .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+	        arcs.append('path')
+	          .attr('d',arc)
+	          .style('fill',function(d,i) {return color(i); });
+
+	        arcs.append('text')
+	          .attr("transform", function(d) {
+	            return "translate(" + arc.centroid(d) + ")";
+	          })
+	          .attr("text-anchor", "middle")
+	         .text(function(d,i) { return  d.value + types[i]; });
+
+	        // Add Caption for the Chart
+      		chart1.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", h - 3 )
+              .style("text-anchor", "middle")
+              .text("All Passengers (" + survived_perc + "%)");
+
+	      };
+
+	      function pieDraw_Male(data) {
+
+	      	data = data.filter(function(d) {
+          			if (d['sex'] == 'male') {
+            		return d;
+          			};
+          		});
+          	data = getPieData(data);
+
+	        //Update Survived Percentages
+	        died = data[0].values['count'];
+	        survived = data[1].values['count'];
+	        survived_perc = d3.round(d3.round((survived / (survived + died)),3)*100,1)
+	        died_perc = d3.round(d3.round((died / (survived + died)),3)*100,1)
+ 
+	        //Width and height
+	        var w = 200,
+	            h = 200,
+	            padd = 20,
+	            r = Math.min(w-padd,h-padd) / 2;
+
+	        var color = d3.scale.ordinal()
+	            .range(['pink','lightblue']);
+
+	        var types = [' Died',' Survived']
+
+	        var outerRadius = Math.min(w-padd,h-padd) / 2;
+	        var innerRadius = 0;
+	        var arc = d3.svg.arc()
+	            .outerRadius(outerRadius)
+	            .innerRadius(innerRadius);
+
+	        var pie = d3.layout.pie()
+	            .sort(null)
+	            .value(function(d) {return d.values.count; });
+
+	        var chart1 = d3.select('#area1').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+	        var arcs = chart1.selectAll('g.arc')
+	                   .data(pie(data))
+	                 .enter().append('g')
+	                   .attr('class','arc')
+	                   .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+	        arcs.append('path')
+	          .attr('d',arc)
+	          .style('fill',function(d,i) {return color(i); });
+
+	        arcs.append('text')
+	          .attr("transform", function(d) {
+	            return "translate(" + arc.centroid(d) + ")";
+	          })
+	          .attr("text-anchor", "middle")
+	         .text(function(d,i) { return  d.value + types[i]; });
+
+	        // Add Caption for the Chart
+      		chart1.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", h - 3 )
+              .style("text-anchor", "middle")
+              .text("Male Passengers (" + survived_perc + "%)");
+
+	      };
+
+	      function pieDraw_Female(data) {
+
+	      	data = data.filter(function(d) {
+          			if (d['sex'] == 'female') {
+            		return d;
+          			};
+          		});
+          	data = getPieData(data);
+
+	        //Update Survived Percentages
+	        died = data[0].values['count'];
+	        survived = data[1].values['count'];
+	        survived_perc = d3.round(d3.round((survived / (survived + died)),3)*100,1)
+	        died_perc = d3.round(d3.round((died / (survived + died)),3)*100,1)
+
+	        //Width and height
+	        var w = 200,
+	            h = 200,
+	            padd = 20,
+	            r = Math.min(w-padd,h-padd) / 2;
+
+	        var color = d3.scale.ordinal()
+	            .range(['pink','lightblue']);
+
+	        var types = [' Died',' Survived']
+
+	        var outerRadius = Math.min(w-padd,h-padd) / 2;
+	        var innerRadius = 0;
+	        var arc = d3.svg.arc()
+	            .outerRadius(outerRadius)
+	            .innerRadius(innerRadius);
+
+	        var pie = d3.layout.pie()
+	            .sort(null)
+	            .value(function(d) {return d.values.count; });
+
+	        var chart1 = d3.select('#area1').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+	        var arcs = chart1.selectAll('g.arc')
+	                   .data(pie(data))
+	                 .enter().append('g')
+	                   .attr('class','arc')
+	                   .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+	        arcs.append('path')
+	          .attr('d',arc)
+	          .style('fill',function(d,i) {return color(i); });
+
+	        arcs.append('text')
+	          .attr("transform", function(d) {
+	            return "translate(" + arc.centroid(d) + ")";
+	          })
+	          .attr("text-anchor", "middle")
+	         .text(function(d,i) { return  d.value + types[i]; });
+
+	        // Add Caption for the Chart
+      		chart1.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", h - 3 )
+              .style("text-anchor", "middle")
+              .text("Female Passengers (" + survived_perc + "%)");
+
+	      };
+
+	      function barDrawSurvived(data) {
+	      	//Data for Bin Stats
+	      	var dataStat = getBarDataAge(data.filter(function(d) {
+          			if (d['survived'] == '0') {
+            		return d;
+          			};
+          		}));
+
+	      	//Data for Bar Charts
+	      	data = data.filter(function(d) {
+          			if (d['survived'] == '1') {
+            		return d;
+          			};
+          		});
+	      	data = getBarDataAge(data);
+
+	      	//Bin Stats: Perform some statistics across the bars, such that the user knows the survival for each bin.
+	      	var per = [];
+	      	var per_opp = [];
+	      	var ran = [0,1,2,3,4,5,6];
+	        for (i in ran) {
+				per.push(data[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+	        for (i in ran) {
+				per_opp.push(dataStat[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+
+	        //Update Survived Percentages
+	        summed = 0;
+	        for (var key in data) { summed += (data[key].values['count']);};
+
+	      	var w = 400,
+	      		h = 170,
+	      		margin = 80,
+	      		padd = 100,
+			    barHeight = 20;
+
+			var x = d3.scale.linear()
+			    .range([0, w-padd])
+			    .domain([0, d3.max(data, function(d) { return +d.values.count; })]);
+
+	        var chart2 = d3.select('#area2').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+		    var bars = chart2.selectAll("g")
+		        .data(data)
+		      .enter().append("g")
+		        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; })
+		        .attr('class','barSurvived');
+
+		    bars.append("rect")
+		        .attr("width", function(d) { return x(+d.values.count); })
+		        .attr("height", barHeight - 1);
+
+		    bars.append("text")
+		        // .attr("x", function(d) { return x(+d.values.count) - 3; })
+		        .attr("x", function(d) { return x(+d.values.count) + 3;})
+		        .attr("y", barHeight / 2)
+		        .attr("dy", ".35em")
+		        // .text(function(d,i) { return d.key.toUpperCase() + " (" + d3.round((d.values.count/summed * 100),2) + '%)'; });
+		        .text(function(d,i) { return d.key.toUpperCase() + " (" + d3.round((per[i] * 100),1) + '%)'; });
+
+	        // Add Caption for the Chart
+      		chart2.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", h - 3 )
+              .style("text-anchor", "middle")
+              .text("Passengers who Survived - Binned by Age");
+
+	      };
+
+	      function barDrawDied(data) {
+	      	// data = data.filter(function(d) {
+        //   			if (d['survived'] == '0') {
+        //     		return d;
+        //   			};
+        //   		});
+
+	      	// data = getBarDataAge(data);
+
+	      	//Data for Bin Stats
+	      	var dataStat = getBarDataAge(data.filter(function(d) {
+          			if (d['survived'] == '1') {
+            		return d;
+          			};
+          		}));
+
+	      	//Data for Bar Charts
+	      	data = data.filter(function(d) {
+          			if (d['survived'] == '0') {
+            		return d;
+          			};
+          		});
+	      	data = getBarDataAge(data);
+
+	      	//Bin Stats: Perform some statistics across the bars, such that the user knows the survival for each bin.
+	      	var per = [];
+	      	var per_opp = [];
+	      	var ran = [0,1,2,3,4,5,6];
+	        for (i in ran) {
+				per.push(data[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+	        for (i in ran) {
+				per_opp.push(dataStat[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+
+	        //Update Survived Percentages
+	        summed = 0;
+	        for (var key in data) { summed += (data[key].values['count']);};
+
+	      	var w = 400,
+	      		h = 170,
+	      		margin = 80,
+	      		padd = 100,
+			    barHeight = 20;
+
+			var x = d3.scale.linear()
+			    .range([0, w-padd])
+			    .domain([0, d3.max(data, function(d) { return +d.values.count; })]);
+
+	        var chart2 = d3.select('#area2').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+		    var bars = chart2.selectAll("g")
+		        .data(data)
+		      .enter().append("g")
+		        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; })
+		        .attr('class','barDied');
+
+		    bars.append("rect")
+		        .attr("width", function(d) { return x(+d.values.count); })
+		        .attr("height", barHeight - 1);
+
+		    bars.append("text")
+		        // .attr("x", function(d) { return x(+d.values.count) - 3; })
+		        .attr("x", function(d) { return x(+d.values.count) + 3;})
+		        .attr("y", barHeight / 2)
+		        .attr("dy", ".35em")
+		        .text(function(d,i) { return d.key.toUpperCase() + " (" + d3.round((per[i] * 100),1) + '%)'; });
+
+	        // Add Caption for the Chart
+      		chart2.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", h - 3 )
+              .style("text-anchor", "middle")
+              .text("Passengers who Died - Binned by Age");
+
+	      };
+
+	  //     function barDrawAll(data) {
+
+	  //     	data = getBarDataDouble(data);
+
+	  //     	var w = 400,
+	  //     		h = 170,
+	  //     		margin = 80,
+	  //     		padd = 10,
+			//     barHeight = 20;
+
+			// var x = d3.scale.linear()
+			//     .range([0, w-padd])
+			//     .domain([0, d3.max(data, function(d) { return +d.values.count; })]);
+
+	  //       var chart4 = d3.select('#area4').append('svg')
+	  //                   .attr('width', w)
+	  //                   .attr('height', h)
+
+		 //    var bars = chart4.selectAll("g")
+		 //        .data(data)
+		 //      .enter().append("g")
+		 //        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; })
+		 //        .attr('class','barAll');
+			// debugger;
+		 //    bars.append("rect")
+		 //        .attr("width", function(d) { return x(+d.values.count); })
+		 //        .attr("height", barHeight - 1);
+
+		 //    bars.append("text")
+		 //        // .attr("x", function(d) { return x(+d.values.count) - 3; })
+		 //        .attr("x", function(d) { return x(+d.values.count) + 3;})
+		 //        .attr("y", barHeight / 2)
+		 //        .attr("dy", ".35em")
+		 //        .text(function(d) { return d.key.toUpperCase() + " - " + d.values.count; });
+
+	  //       // Add Caption for the Chart
+   //    		chart2.append("text")     
+   //            .attr("x", (w / 2) - 5 )
+   //            .attr("y", h - 3 )
+   //            .style("text-anchor", "middle")
+   //            .text("All Passengers - Binned by Age Group");
+
+	  //     };
+
+	      function tilesDraw(data,num) {
+	      	console.log('okay')
+	      	data = data.filter(function(d) {
+          			if (d['pclass'] == num) {
+            		return d;
+          			};
+          		});
+
+	        var w = 260,
+	      		h = 220,
+	      		padd = 20;
+
+	      	//Title Check
+	      	if(num == 1) {var class_title =  '1st Class';} else if (num == 2) {var class_title =  '2nd Class';} else {var class_title =  '3rd Class';}
+
+	        //Update Survived Percentages
+	        var total = data.length;
+	        var surv_tile = 0;
+	        for (var key in data) { surv_tile += (+data[key].survived)}
+	        var died_tile = total - surv_tile;
+
+	      	// Sizing for the grid visualization
+			squareSize = 6;
+			squarePad = 2;
+			numPerRow = (w - padd) / (squareSize + squarePad);
+
+			var tData = parseTileData(data);
+			// Sort the Data by survived status
+			// tData = tData.sort(function(a, b){return (+a.survived) - (+b.survived)});
+
+			var chart3 = d3.select('#area4').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+		    var squares = chart3.selectAll("g")
+		    		.data(tData);
+		    	  // .data(tData.sort(function(a,b) { return  +b['survived'] - +a['survived'];}));
+
+		    squares.enter()
+			      .append("rect")
+			      .attr("width", squareSize)
+			      .attr("height", squareSize)
+			      .attr("fill", function(d) {if (d.survived == '1') {return 'lightblue';} else {return 'pink';}})
+			      .classed("square", true)
+			      // .classed("fill-square", function(d) { return d.filler; })
+			      .attr("x", function(d) { return d.x;})
+			      .attr("y", function(d) { return d.y + padd;})
+			      .attr("opacity", 1);
+
+	        // Add Caption for the Chart
+      		chart3.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", padd - 5 )
+              .style("text-anchor", "middle")
+              .text(class_title + " Survival - " + d3.round((surv_tile / total * 100),1) + "%");
+
+	        //TOOLTIP - using pageX and pageY to position without having to use SVG coordinates (which complicates matters for items near the SVG edges.)
+	        squares.on("mouseover", function(d) {
+	            div.transition()    
+	               .duration(300)   
+	               .style("opacity", .9);   
+	            div.html(
+	              "<font size='4'>"+d.survived_formal+"</font>" + '<br/>' + 
+	              '<strong/>' + 'Name: ' + '</strong>' + d.name + '<br/>' + 
+	              '<strong/>' + 'Sex: ' + '</strong>' + toTitleCase(d.sex) + '<br/>' + 
+	              '<strong/>' + 'Age: ' + '</strong>' + d.age + '<br/>' + 
+	              '<strong/>' + 'Fare: ' + '</strong>' + d3.round(d.fare) + '<br/>' + 
+	              '<strong/>' + 'Travel Class: ' + '</strong>' + d.class_formal)
+	               .style("left", (d3.event.pageX + 8) + "px")    
+	               .style("top", (d3.event.pageY + 8) + "px");  
+	            })
+	              .on("mouseout", function() {
+	                div.transition()
+	                   .duration(300)
+	                   .style('opacity',0);
+	            })
+
+	      };
+
+	      function barDrawFareSurvived(data) {
+	      	// data = data.filter(function(d) {
+        //   			if (d['survived'] == '1') {
+        //     		return d;
+        //   			};
+        //   		});
+
+	      	// data = getBarDataFare(data);
+
+	      	//Data for Bin Stats
+	      	var dataStat = getBarDataFare(data.filter(function(d) {
+          			if (d['survived'] == '0') {
+            		return d;
+          			};
+          		}));
+
+	      	//Data for Bar Charts
+	      	data = data.filter(function(d) {
+          			if (d['survived'] == '1') {
+            		return d;
+          			};
+          		});
+	      	data = getBarDataFare(data);
+
+	      	//Bin Stats: Perform some statistics across the bars, such that the user knows the survival for each bin.
+	      	var per = [];
+	      	var per_opp = [];
+	      	var ran = [0,1,2,3,4,5];
+	        for (i in ran) {
+				per.push(data[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+	        for (i in ran) {
+				per_opp.push(dataStat[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+
+	        //Update Survived Percentages
+	        summed = 0;
+	        for (var key in data) { summed += (data[key].values['count']);};
+
+	      	var w = 400,
+	      		h = 170,
+	      		margin = 80,
+	      		padd = 100,
+			    barHeight = 20;
+
+			var x = d3.scale.linear()
+			    .range([0, w-padd])
+			    .domain([0, d3.max(data, function(d) { return +d.values.count; })]);
+
+	        var chart2 = d3.select('#area3').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+		    var bars = chart2.selectAll("g")
+		        .data(data)
+		      .enter().append("g")
+		        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; })
+		        .attr('class','barSurvived');
+
+		    bars.append("rect")
+		        .attr("width", function(d) { return x(+d.values.count); })
+		        .attr("height", barHeight - 1);
+
+		    bars.append("text")
+		        // .attr("x", function(d) { return x(+d.values.count) - 3; })
+		        .attr("x", function(d) { return x(+d.values.count) + 3;})
+		        .attr("y", barHeight / 2)
+		        .attr("dy", ".35em")
+		        .text(function(d,i) { return d.key.substring(2) + " (" + d3.round((per[i] * 100),1) + '%)'; });
+
+	        // Add Caption for the Chart
+      		chart2.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", h - 3 )
+              .style("text-anchor", "middle")
+              .text("Passengers who Survived - Binned by Fare");
+
+	      };
+
+	      function barDrawFareDied(data) {
+	      	// data = data.filter(function(d) {
+        //   			if (d['survived'] == '0') {
+        //     		return d;
+        //   			};
+        //   		});
+
+	      	// data = getBarDataFare(data);
+
+	      	//Data for Bin Stats
+	      	var dataStat = getBarDataFare(data.filter(function(d) {
+          			if (d['survived'] == '1') {
+            		return d;
+          			};
+          		}));
+
+	      	//Data for Bar Charts
+	      	data = data.filter(function(d) {
+          			if (d['survived'] == '0') {
+            		return d;
+          			};
+          		});
+	      	data = getBarDataFare(data);
+
+	      	//Bin Stats: Perform some statistics across the bars, such that the user knows the survival for each bin.
+	      	var per = [];
+	      	var per_opp = [];
+	      	var ran = [0,1,2,3,4,5];
+	        for (i in ran) {
+				per.push(data[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+	        for (i in ran) {
+				per_opp.push(dataStat[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+
+	        //Update Survived Percentages
+	        summed = 0;
+	        for (var key in data) { summed += (data[key].values['count']);};
+
+	      	var w = 400,
+	      		h = 170,
+	      		margin = 80,
+	      		padd = 100,
+			    barHeight = 20;
+
+			var x = d3.scale.linear()
+			    .range([0, w-padd])
+			    .domain([0, d3.max(data, function(d) { return +d.values.count; })]);
+
+	        var chart2 = d3.select('#area3').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+		    var bars = chart2.selectAll("g")
+		        .data(data)
+		      .enter().append("g")
+		        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; })
+		        .attr('class','barDied');
+
+		    bars.append("rect")
+		        .attr("width", function(d) { return x(+d.values.count); })
+		        .attr("height", barHeight - 1);
+
+		    bars.append("text")
+		        // .attr("x", function(d) { return x(+d.values.count) - 3; })
+		        .attr("x", function(d) { return x(+d.values.count) + 3;})
+		        .attr("y", barHeight / 2)
+		        .attr("dy", ".35em")
+		        .text(function(d,i) { return d.key.substring(2) + " (" + d3.round((per[i] * 100),1) + '%)'; });
+
+	        // Add Caption for the Chart
+      		chart2.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", h - 3 )
+              .style("text-anchor", "middle")
+              .text("Passengers who Died - Binned by Fare");
+
+	      };
+
+
+	    pieDraw_All(all_data);  // Initiate the pie drawing
+	    pieDraw_Male(all_data);  // Initiate the pie drawing
+	    pieDraw_Female(all_data);  // Initiate the pie drawing
+	    barDrawSurvived(all_data);
+	    barDrawDied(all_data);
+	    // tilesDraw(all_data); //Initiative the tiles drawing
+	    tilesDraw(all_data,1); //Draw First Class
+	    tilesDraw(all_data,2); //Draw Second Class
+	    tilesDraw(all_data,3); //Draw Third Class
+	    // barDrawAll(all_data);
+	    barDrawFareSurvived(all_data);
+	    barDrawFareDied(all_data);
+		};
+
+	    // Data Parsing
+
+		function toTitleCase(str)
+		{
+		    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+		}
+
+	      function getPieData(data) {
+	        return  d3.nest()
+	                    .key(function(d) {return d.survived;})
+	                    .sortKeys(d3.ascending)
+	                    .rollup(function(d) {
+	                      return {
+	                        survived: d3.min(d,function(g) {return +g.survived;}),
+	                        count: d.length
+	                      };
+	                      })
+	                    .entries(data)
+	      };
+
+	      function getBarData(data) {
+	        return  d3.nest()
+	                    .key(function(d) {return d.sex;})
+	                    .sortKeys(d3.ascending)
+	                    .rollup(function(d) {
+	                      return {
+	                        sex: d3.min(d,function(g) {return g.sex;}),
+	                        count: d.length
+	                      };
+	                      })
+	                    .entries(data)
+	      };
+
+
+	      function getBarDataAge(data) {
+	        return  d3.nest()
+	                    .key(function(d) {return d.age_bin;})
+	                    .sortKeys(d3.ascending)
+	                    .rollup(function(d) {
+	                      return {
+	                        age_bin: d3.min(d,function(g) {return g.age_bin;}),
+	                        count: d.length
+	                      };
+	                      })
+	                    .entries(data)
+	      };
+
+	      function getBarDataFare(data) {
+	        return  d3.nest()
+	                    .key(function(d) {return d.fare_bin;})
+	                    .sortKeys(d3.ascending)
+	                    .rollup(function(d) {
+	                      return {
+	                        age_bin: d3.min(d,function(g) {return g.fare_bin;}),
+	                        count: d.length
+	                      };
+	                      })
+	                    .entries(data)
+	      };
+
+	      function getBarDataDouble(data) {
+	        return  d3.nest()
+	                    .key(function(d) {return d.survived;})
+	                    .key(function(d) {return d.age_bin;})
+	                    .sortKeys(d3.ascending)
+	                    .rollup(function(d) {
+	                      return {
+	                        age_bin: d3.min(d,function(g) {return g.age_bin;}),
+	                        count: d.length
+	                      };
+	                      })
+	                    .entries(data)
+	      };
+
+	      function getAllData(data) {
+	      	var new_data1 = data.map(function(d) {
+	      		return {
+	      		  fare: +d.fare,
+		          age: d.age == '' ? NaN : +d.age,
+		          sibsp: +d.sibsp,
+		          pclass: +d.pclass,
+		          sex: d.sex,
+		          name: d.name,
+		          survived: d.survived,
+		          age_bin: d.age_bin,
+		          survived_formal: d.survived_formal,
+		          class_formal: d.class_formal,
+		          fare_bin: d.fare_bin
+		      };
+		  	});
+
+	      	return new_data1;
+	      };
+
+	      function parseTileData(rawdata) {
+	      	rawdata = rawdata.sort(function(a, b){return (+a.survived) - (+b.survived)});
+	      	var new_data2 = rawdata.map(function(d,i) { 
+	      		d.col = i % numPerRow;
+	      		d.x = d.col * (squareSize + squarePad);
+	      		d.row = Math.floor(i / numPerRow);
+	      		d.y = d.row * (squareSize + squarePad);
+	      		return d;
+	      	});
+
+	      	return new_data2;
+	      };
+
+	      function display(data) {
+	        all_data = getAllData(data);
+
+	        viz(all_data);
+	      };
+
+	      // load data and display
+	      d3.csv("titanic_full.csv",display);
+						
+		</script>
+	</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <title>Titanic Visualization - Pie</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <style type="text/css">
+
+    </style>
+  </head>
+  <body>
+
+    <script type='text/javascript'>
+
+      function display(data) {
+        debugger;
+        var agg = d3.nest()
+                    .key(function(d) {return d.survived;})
+                    .sortKeys(d3.ascending)
+                    .rollup(function(d) {
+                      return {
+                        survived: d3.min(d,function(g) {return +g.survived;}),
+                        surv_count: d.length
+                      };
+                      })
+                    .entries(data)
+        debugger;
+
+      }
+      // load data and display
+      d3.csv("titanic_full.csv",display);
+      // d3.tsv('data/words.tsv',display);
+    </script>
+  </body>
+</html>

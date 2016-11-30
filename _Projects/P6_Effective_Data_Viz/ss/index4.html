@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+		<meta charset='utf-8'>
+		<title>Titanic Visualization - Fare and Age Survival</title>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<style type="text/css">
+		circle {
+			stroke: black;
+			stroke-width: 0.5;
+			opacity: 0.5;
+		}
+		h2 {
+        	text-align: center;
+        	color: red;
+      	}
+		.axis path,
+		.axis line {
+			fill: none;
+			stroke: black;
+			shape-rendering: crispEdges;
+		}
+		
+		.axis text {
+			font-family: sans-serif;
+			font-size: 8px;
+		}
+
+		div.tooltip {	
+		    position: absolute;			
+		    text-align: left;			
+		    width: 160px;					
+		    height: 70px;					
+		    padding: 3px;				
+		    font: 11px sans-serif;		
+		    background: orange;	
+		    border: 0px;		
+		    border-radius: 8px;			
+		    pointer-events: none;
+		}
+		div.cat_buttons {
+	        position: fixed;
+	        top: 5px;
+	        left: 50px;
+      	}
+        div.cat_buttons div {
+	        background-color: rgb(251, 201, 127);
+	        padding: 3px;
+	        margin: 7px;
+      	}
+		</style>
+	</head>
+	<body>
+<!-- 		<p>Click here to do something</p>
+		<div id="tooltip" class="hidden">
+			<p><strong>Passenger Details</strong></p>
+			<p><span id="value">100</span></p>
+			<p><span id="value">100</span></p>
+		</div> -->
+		<script type='text/javascript'>
+			//*Load in the Data*
+			// var dataset = []
+			// d3.csv('titanic_full.csv', function(d) {
+			// 	d['fare'] = +d['fare'];
+			// 	if (d['age'] == '') {d['age'] = NaN} else {d['age'] = +d['age']};
+			// 	d['sibsp'] = +d['sibsp'];
+			// 	d['pclass'] = +d['pclass'];
+			// 	console.log(dataset)
+			// });
+
+			d3.csv("titanic_full.csv", function(d) {
+			  return {
+			    fare: +d.fare,
+			    age: d.age == '' ? NaN : +d.age,
+			    sibsp: +d.sibsp,
+			    pclass: +d.pclass,
+			    sex: d.sex,
+			    name: d.name,
+			    survived: d.survived
+
+			  };
+			}, function(error, d) {
+			  //Filter out erroneous age values (263 rows are removed)
+			  var dataset = d.filter(function(d) {
+			    if (d['age'] >= 0) {
+			      return d;
+			    }
+			  });
+
+				//*MAIN ELEMENTS SETUP*
+				
+				//Width and height
+				var w = 750;
+				var h = 750;
+				var z_upper = 8;
+				var z_lower = 3;
+				var padding = 20;
+
+				//Create scale functions
+				var xScale = d3.scale.linear()
+									 .domain([0, d3.max(dataset, function(d) { return d.fare; })])
+									 .range([padding, w - padding * 2]); // introduced this to make sure values are not cut off
+
+				var yScale = d3.scale.linear()
+									 .domain([0, d3.max(dataset, function(d) { return d.age; })])
+									 .range([h - padding, padding]);
+
+				var zScale = d3.scale.linear()
+									 .domain([0, d3.max(dataset, function(d) { return d.sibsp; })])
+									 .range([z_lower, z_upper]);
+
+				var xAxis = d3.svg.axis()
+								  .scale(xScale)
+								  .orient("bottom");
+
+				var yAxis = d3.svg.axis()
+								  .scale(yScale)
+								  .orient("left");
+
+				//Create Title
+				d3.select('body')
+		          .append('h2')
+		          .text('Titanic Passengers - All Shown')
+
+		        // Define the div for the tooltip
+				var div = d3.select("body").append("div")	
+				    .attr("class", "tooltip")				
+				    .style("opacity", 0);
+
+				//Create SVG element
+				var svg = d3.select("body")
+							.append("svg")
+							.attr("width", w)
+							.attr("height", h);
+
+			   	//Show Axes
+			   	svg.append('g')
+			   	   .attr('class','x axis')
+			   	   .attr('transform','translate(0,' + (h - padding)+')')
+			   	   .call(xAxis);
+
+		   	   	svg.append('g')
+			   	   .attr('class','y axis')
+			   	   .attr('transform','translate(' + padding + ',0)')
+			   	   .call(yAxis);
+
+		   	   	//Create Legend (there are two data elements created)
+		   	   	var legend = svg.append("g")
+		           .attr("class","legend")
+		           .attr("transform", "translate(" + (w - 100) + "," + 15 + ")") //adding to top-right area
+		           .selectAll("g")
+		           .data(["Survived","Died"]) // returning two group elements
+		           .enter().append("g");
+
+	            legend.append("circle")
+		            .attr("cy", function(d,i) {
+		            	console.log(i)
+		              return i * 30;
+		            })
+		            .attr("r", 5)
+		            .attr("fill", function(d) {
+		              if (d == "Survived") {
+		                return 'blue';
+		              } else {
+		                return 'red';
+		              }
+		            });
+
+		          legend.append("text")
+		            .attr("y", function(d,i) {
+		              return i * 30 + 5;
+		            })
+		            .attr("x", 5 * 5)
+		            .text(function(d) {
+		              return d;
+		            });
+
+		        //*UPDATE FUNCTION*
+			   	function update(dataset) {
+			   		//Update Scale Domains
+					xScale.domain([0, d3.max(dataset, function(d) { return d.fare; })]);
+					yScale.domain([0, d3.max(dataset, function(d) { return d.age; })]);
+					zScale.domain([0, d3.max(dataset, function(d) { return d.sibsp; })]);
+
+			   		//DATA JOIN
+			   		//Join new data with old elements, if any.
+			   		var circle = svg.selectAll('circle')
+			   						.data(dataset);
+
+					//UPDATE
+					//Update old elements as needed.
+					circle.attr('class','update');
+
+					//ENTER
+					//Create new elements as needed.
+					circle.enter().append('circle')
+						  .attr('class','enter')
+						  .transition()
+						  .duration(500)
+						  .attr("cx", function(d) { return xScale(d.fare); })
+						  .attr("cy", function(d) { return yScale(d.age); })
+						  .attr("r", function(d) { return zScale(d.sibsp);})
+						  .attr('fill', function(d) {
+						  	if (d.survived === '0') 
+						  		{ return 'red'; } 
+						  	else 
+						  		{ return 'blue'; }
+						   	})
+
+					//ENTER + UPDATE
+					//Appending to the enter selection expands the update selection to include
+					//entering elements; so, operations on the update selection after appending to
+					//the enter selection will apply to both entering and updating nodes.
+					circle.text(function(d) {return d;});
+
+					//EXIT
+					//Remove old elements as needed.
+					circle.exit().remove();
+
+					//TOOLTIP
+					circle.on("mouseover", function(d) {
+							div.transition()		
+				               .duration(200)		
+				               .style("opacity", .9);		
+				            div.html(
+				            	'<strong/>' + 'Name: ' + '</strong>' + d.name + '<br/>' + 
+				            	'<strong/>' + 'Sex: ' + '</strong>' + d.sex + '<br/>' + 
+				            	'<strong/>' + 'Age: ' + '</strong>' + d.age)
+				               .style("left", d3.select(this).attr("cx") + "px")		
+				               .style("top", (d3.select(this).attr("cy") +50) + "px");	
+
+				   		})
+				   	    .on("mouseout", function() {
+				   	    	div.transition()
+				   	    	   .duration(300)
+				   	    	   .style('opacity',0);
+				   		})
+
+					//Update the Title
+          			d3.select('h2')
+            		  .text("Titanic Passengers - " + option);
+
+				   	//Update X axis
+					svg.select(".x.axis")
+				    	.transition()
+				    	.duration(500)
+						.call(xAxis);
+					
+					//Update Y axis
+					svg.select(".y.axis")
+				    	.transition()
+				    	.duration(500)
+						.call(yAxis);
+
+					console.log('checking!!! --->'+option)
+					console.log('checking!!! --->'+circle.length)
+			   	};
+
+				//The initial display with the inital option variable (as all the data is shown)
+				var option = 'All'
+				update(dataset);
+
+				//*INTERVAL PROCESS*
+				//Setting up the Interval Variables
+				var options = ['Female Only','Male Only','Children Only','All'];
+				var option_idx = 0;
+				option = options[option_idx];
+				console.log(option)
+
+				//The Interval that cycles through all the filtered datasets.
+				var option_interval = setInterval(function() {
+					if (option == 'Female Only') {filteredData = dataset.filter(function(d) {
+				   			if (d['sex'] == 'female') {return d;}})} 
+			   			else if (option == 'Male Only') {var filteredData = dataset.filter(function(d) {
+				   			if (d['sex'] == 'male') {return d;}})} 
+			   			else if (option == 'Children Only') {var filteredData = dataset.filter(function(d) {
+				   			if (d['age'] <= 13 ) {return d;}})} 
+			   			else if (option == 'All') {var filteredData = dataset.filter(function(d) {
+				   			return d;})};
+		   			console.log('interval')
+		   			
+		   			console.log(option)
+		   			console.log(option_idx)
+					//debugger;
+
+					update(filteredData);
+
+					// Control Mechanism (increments counter and stops interval)
+					option_idx++; // increment by one
+		   			option = options[option_idx];
+					if (option_idx >= options.length) {
+
+						//Once we have run through the options, then we clear the interval.
+						clearInterval(option_interval);
+
+						//*POST INTERVAL - BUTTONS*
+						//Add the divs to the body
+						var buttons = d3.select('body')
+							.append('div')
+							.attr('class','cat_buttons')
+							.selectAll('div')
+							.data(options)
+							.enter()
+							.append('div')
+							.text(function(d) {return d;});
+
+						//Event Handler
+						// buttons.on('click',function(d) {})
+					};
+				},1500); 
+			        
+			});
+		</script>
+	</body>
+</html>

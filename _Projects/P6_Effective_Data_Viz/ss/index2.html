@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+		<meta charset='utf-8'>
+		<title>D3 Test</title>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */		
+		</style>
+	</head>
+	<body>
+		<script type='text/javascript'>
+			//Data Visualization
+			function generateViz(dataset) {
+				//Width and height
+				var w = 1500;
+				var h = 50;
+
+				//Create SVG element
+				var svg = d3.select("body")
+							.append("svg")
+							.attr("width", w)
+							.attr("height", h);
+
+				svg.selectAll('circle')
+				   .data(dataset)
+				   .enter()
+				   .append('circle')
+				   .attr("cx", function(d, i) { return (i * 3) + 25; })
+				   .attr("cy", h/2)
+				   .attr("r", function(d) { return (d.age / 10); })
+				   .attr('fill', function(d) {
+				   	if (d.survived === '0') {
+				   		return 'green';
+				   	} else {
+				   		return 'red';
+				   	}
+				   	});
+
+			    svg.selectAll('text')
+			       .data(dataset)
+			       .enter()
+			       .append('text')
+			       .text(function(d) {
+			       		return d.age;
+			       })
+			       .attr('x', function(d,i) {
+			       		return i * (w / dataset.length) + 2;
+			       })
+			       .attr('y', function(d,i) {
+			       		return h/2;
+			       })
+			       .attr("font-family", "sans-serif")
+				   .attr("font-size", "5px")
+				   .attr("fill", "white");
+
+					   
+			}
+
+			//Data Loading
+			//var dataset = [5,10,15,20,25]
+			var dataset; //Declare global variable
+			d3.csv('titanic_full.csv', function(data) {
+				dataset = data; // Handoff to global var
+				// Call the visualization function
+				generateViz(dataset);
+			});
+			
+		</script>
+	</body>
+</html>

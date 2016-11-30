@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Titanic Survivability</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="http://code.jquery.com/jquery.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+		<style type="text/css">
+
+        div.header {
+              text-align: center;
+              color: black;
+        }
+
+        div.commentary {
+              text-align: center;
+              color: gray;
+        }
+
+         div.conclusion {
+              text-align: center;
+              color: black;
+              font: 16px sans-serif;
+        }
+
+        div.chart {
+              text-align: center;
+              padding-top: 40px;
+        }
+
+		.axis text {
+		  font: 10px sans-serif;
+		}
+
+		.axis path,
+		.axis line {
+		  fill: none;
+		  stroke: #000;
+		  shape-rendering: crispEdges;
+		}
+
+		.x.axis path {
+		  display: none;
+		}
+
+        .barSurvived rect {
+		  fill: lightblue;
+		}
+
+		.barDied rect {
+		  fill: pink;
+		}
+
+		.barAll rect {
+		  fill: blue;
+		}
+
+		.barSurvived text {
+		  fill: black;
+		  font: 10px sans-serif;
+		}
+
+		.barDied text {
+		  fill: black;
+		  font: 10px sans-serif;
+		}
+
+		.barAll text {
+		  fill: black;
+		  font: 10px sans-serif;
+		  /*text-anchor: start;*/
+		}
+
+        div.tooltip { 
+            position: absolute;     
+            text-align: left;     
+            width: 250px;         
+            height: 100px;         
+            padding: 3px;       
+            font: 11px sans-serif;    
+            background: white;  
+            border: 0px;    
+            border-radius: 8px;     
+            pointer-events: none;
+        }
+        
+		</style>
+	</head>
+	<div class="header" id="title"></div>
+	<div class="header" id="subtitle"></div>
+	<div class="header" id="abstract"></div>
+	<div class="commentary" id="area0_com"></div>
+	<div class="chart" id="area1"></div>
+	<div class="commentary" id="area1_com"></div>
+	<div class="chart" id="area2"></div>
+	<div class="commentary" id="area2_com"></div>
+	<div class="chart" id="area3"></div>
+	<div class="commentary" id="area3_com"></div>
+	<div class="chart" id="area4"></div>
+	<div class="commentary" id="area4_com"></div>
+	<div class="conclusion" id="area5_com"></div>
+	<body>
+		<script type="text/javascript">
+
+		//** Main Elements **
+	      //Create Title
+	      d3.select('#title')
+	        .append('h1')
+	        .html('A Tale of Survivability through Key Passenger Attributes')
+
+  	      //Create Commentary
+	      d3.select('#subtitle')
+	        .append('h4')
+	        .text('Andy Miller | Data Analyst Nanodegree | May 2016')
+
+	      //Create Abstract
+	      d3.select('#abstract')
+	        .append('p')
+	        .html('In April of 1912, the Titanic left on its maiden voyage with 2,224 passengers (approx. 915 of which were crew).  The Titanic, the largest vessel at the time, left England on a voyage to New York City.  Just four days after leaving port, the Titanic hit an iceberg at 11:40pm ship time, causing the massive ship to sink in roughly 2 hours time (approx. 2 hours before another ship was able to navigate to the wreck and save many people).  While the iceberg caused this disaster, the loss of life was primarily due to a lack of lifeboats, as well as, poorly executed protocol.  The Titanic only had enough lifeboats to carry about half of those onboard.  Many lifeboats were launched only partly loaded.  <br/><br/><h5>Using the passenger list (excluding crew), I decided to tell a visual story of survivability using key passenger attributes that correlated with survival.  Those attributes being sex, age, fare and class.<h5/>')
+
+	      //Create Area0 - Commentary
+	      d3.select('#area0_com')
+	        .append('p')
+	        .html('<h5><br/><br/>Survivability by Sex:<h5/>')
+	      //Create Area1 - Commentary
+	      d3.select('#area1_com')
+	        .append('p')
+	        .html('<br/>Overall, we see that of the 1,309 passengers, only 500 survived this disaster.  A disproportionate number of males died during this disaster (only 19.1% survived), which is in direct contrast to females (72.7% survived).  This was primarily due to the "Women and Children" first protocol followed by many of the officers loading the lifeboats.  This is the most significant feature contibuting to survivability.<h5><br/><br/>Survivability by Age:<h5/>')
+	      //Create Area2 - Commentary
+	      d3.select('#area2_com')
+	        .append('p')
+	        .html('<br/>Above, I have binned passengers into groups of 13 years.  The percentages apply across the graphs, showing the rate (of survival or death) for each bin.  Similar to the above pie charts, the protocol of "Women and Children First" was true for those persons under 13 years of age (survival at 57.6%), though not as significant as we saw for females (who survived 72.7% of time).  Further, we notice that at ages 13 to 52 (likely some of the most capable passengers) only had a survivability of about 40%.  All this further strengthens the point that of the women and children point of view.<h5><br/><br/>Survivability by Fare:<h5/>')
+	      //Create Area3 - Commentary
+	      d3.select('#area3_com')
+	        .append('p')
+	        .html('<br/>Beyond the "Women and Children" theme that we had seen above, another key attribute of survival was a persons "class" which is explored in the final two visualizations (above and below).  In the above visualization, I have binned passengers by the fare they paid, again segregated by whether they survived or died.  Again, I have labeled the bars with the percent of survival across the similar bars, with the axis being the count of passengers.  We note that There was MUCH higher survivability amongst the persons that paid greater than 50 Great British Pound (GBP), with those paying more than 100 GBP having a fairly higher survivability.  While most passengers paid less than 50 GBP (about 1050 passengers), survivability was low (725 or approx. 70% died).<h5><br/><br/>Survivability by Cabin Class:<h5/>')
+	      //Create Area4 - Commentary
+	      d3.select('#area4_com')
+	        .append('p')
+	        .html('<br/>Finally, and building on the other major theme of "Class" (besides "Women and Children" from the first two), this visualization exemplifies the point that survivability was greater for those passengers that were in 1st class, as 62% of those passengers survived.  Contrasting that was 3rd class, which had a paltry 25.5% survival.<br/><br/><h5>Hover over the squares to see passenger detail.<h5/>')
+	      //Create Area5 - Conclusion
+	      d3.select('#area5_com')
+	        .append('p')
+	        .html('<br/>Overall, it should be understood that survivability was truly a complex matter, where only those aboard understand how certain people came to die or survive. However, through a visual analysis of certain key passenger attributes (sex, age, fare paid and cabin class), we are able to see more clearly what correlates (but does not cause) survivability to increase or decrease.  My conclusion, after much time spent analyzing and visualizing this data, is that these attributes did increase or decrease ones chance of survival, with passenger sex and cabin class being two of the most prominent contributors.')
+	      // Define the div for the tooltip
+	      var div = d3.select("body").append("div") 
+	                  .attr("class", "tooltip")       
+	                  .style("opacity", 0);
+
+	    function viz(all_data) {
+	    // This function controls all of the visualizations, including 3 pie charts, 4 bar charts (2 for binned ages and 2 for binned fares), and the cabin class tile. 
+
+	      function pieDraw_All(data) {
+	      	// Draw the pie chart for ALL passengers.
+
+          	data = getPieData(data); // Get the data
+
+	        // Survived Percentages - used to lable the pie chart.
+	        died = data[0].values['count'];
+	        survived = data[1].values['count'];
+	        survived_perc = d3.round(d3.round((survived / (survived + died)),3)*100,1)
+	        died_perc = d3.round(d3.round((died / (survived + died)),3)*100,1)
+ 
+	        //Width and height
+	        var w = 200,
+	            h = 200,
+	            padd = 20,
+	            r = Math.min(w-padd,h-padd) / 2;
+
+	        // Setup the variable to return color
+	        var color = d3.scale.ordinal()
+	            .range(['pink','lightblue']);
+
+	        // Type for labeling
+	        var types = [' Died',' Survived']
+
+	        // Setup Pie Radius
+	        var outerRadius = Math.min(w-padd,h-padd) / 2;
+	        var innerRadius = 0;
+	        var arc = d3.svg.arc()
+	            .outerRadius(outerRadius)
+	            .innerRadius(innerRadius);
+
+	        // Setup the pie chart layout
+	        var pie = d3.layout.pie()
+	            .sort(null)
+	            .value(function(d) {return d.values.count; });
+
+	        var chart1 = d3.select('#area1').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+	        var arcs = chart1.selectAll('g.arc')
+	                   .data(pie(data))
+	                 .enter().append('g')
+	                   .attr('class','arc')
+	                   .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+	        arcs.append('path')
+	          .attr('d',arc)
+	          .style('fill',function(d,i) {return color(i); });
+
+	        arcs.append('text')
+	          .attr("transform", function(d) {
+	            return "translate(" + arc.centroid(d) + ")";
+	          })
+	          .attr("text-anchor", "middle")
+	         .text(function(d,i) { return  d.value + types[i]; });
+
+	        // Add Caption for the Chart
+      		chart1.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", h - 3 )
+              .style("text-anchor", "middle")
+              .text("All Passengers (" + survived_perc + "%)");
+
+	      };
+
+	      function pieDraw_Male(data) {
+	      	// Draw the pie chart for MALE passengers.
+
+	      	data = data.filter(function(d) {
+          			if (d['sex'] == 'male') {
+            		return d;
+          			};
+          		});
+          	data = getPieData(data);
+
+	        // Survived Percentages - used to lable the pie chart.
+	        died = data[0].values['count'];
+	        survived = data[1].values['count'];
+	        survived_perc = d3.round(d3.round((survived / (survived + died)),3)*100,1)
+	        died_perc = d3.round(d3.round((died / (survived + died)),3)*100,1)
+ 
+	        //Width and height
+	        var w = 200,
+	            h = 200,
+	            padd = 20,
+	            r = Math.min(w-padd,h-padd) / 2;
+
+	        // Setup the variable to return color
+	        var color = d3.scale.ordinal()
+	            .range(['pink','lightblue']);
+
+	        // Type for labeling
+	        var types = [' Died',' Survived']
+
+	        // Setup Pie Radius
+	        var outerRadius = Math.min(w-padd,h-padd) / 2;
+	        var innerRadius = 0;
+	        var arc = d3.svg.arc()
+	            .outerRadius(outerRadius)
+	            .innerRadius(innerRadius);
+
+	        // Setup the pie chart layout
+	        var pie = d3.layout.pie()
+	            .sort(null)
+	            .value(function(d) {return d.values.count; });
+
+	        var chart1 = d3.select('#area1').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+	        var arcs = chart1.selectAll('g.arc')
+	                   .data(pie(data))
+	                 .enter().append('g')
+	                   .attr('class','arc')
+	                   .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+	        arcs.append('path')
+	          .attr('d',arc)
+	          .style('fill',function(d,i) {return color(i); });
+
+	        arcs.append('text')
+	          .attr("transform", function(d) {
+	            return "translate(" + arc.centroid(d) + ")";
+	          })
+	          .attr("text-anchor", "middle")
+	         .text(function(d,i) { return  d.value + types[i]; });
+
+	        // Add Caption for the Chart
+      		chart1.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", h - 3 )
+              .style("text-anchor", "middle")
+              .text("Male Passengers (" + survived_perc + "%)");
+
+	      };
+
+	      function pieDraw_Female(data) {
+	      	// Draw the pie chart for FEMALE passengers.
+
+	      	data = data.filter(function(d) {
+          			if (d['sex'] == 'female') {
+            		return d;
+          			};
+          		});
+          	data = getPieData(data);
+
+	        // Survived Percentages - used to label the pie chart.
+	        died = data[0].values['count'];
+	        survived = data[1].values['count'];
+	        survived_perc = d3.round(d3.round((survived / (survived + died)),3)*100,1)
+	        died_perc = d3.round(d3.round((died / (survived + died)),3)*100,1)
+
+	        //Width and height
+	        var w = 200,
+	            h = 200,
+	            padd = 20,
+	            r = Math.min(w-padd,h-padd) / 2;
+
+	        // Setup the variable to return color
+	        var color = d3.scale.ordinal()
+	            .range(['pink','lightblue']);
+
+	        // Type for labeling
+	        var types = [' Died',' Survived']
+
+	        // Setup Pie Radius
+	        var outerRadius = Math.min(w-padd,h-padd) / 2;
+	        var innerRadius = 0;
+	        var arc = d3.svg.arc()
+	            .outerRadius(outerRadius)
+	            .innerRadius(innerRadius);
+
+	        // Setup the pie chart layout
+	        var pie = d3.layout.pie()
+	            .sort(null)
+	            .value(function(d) {return d.values.count; });
+
+	        var chart1 = d3.select('#area1').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+	        var arcs = chart1.selectAll('g.arc')
+	                   .data(pie(data))
+	                 .enter().append('g')
+	                   .attr('class','arc')
+	                   .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+	        arcs.append('path')
+	          .attr('d',arc)
+	          .style('fill',function(d,i) {return color(i); });
+
+	        arcs.append('text')
+	          .attr("transform", function(d) {
+	            return "translate(" + arc.centroid(d) + ")";
+	          })
+	          .attr("text-anchor", "middle")
+	         .text(function(d,i) { return  d.value + types[i]; });
+
+	        // Add Caption for the Chart
+      		chart1.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", h - 3 )
+              .style("text-anchor", "middle")
+              .text("Female Passengers (" + survived_perc + "%)");
+
+	      };
+
+	      function barDrawSurvived(data) {
+	      	//Data for Bin Stats ONLY
+	      	var dataStat = getBarDataAge(data.filter(function(d) {
+          			if (d['survived'] == '0') {
+            		return d;
+          			};
+          		}));
+
+	      	//Data for Bar Charts (Main)
+	      	data = data.filter(function(d) {
+          			if (d['survived'] == '1') {
+            		return d;
+          			};
+          		});
+	      	data = getBarDataAge(data);
+
+	      	//Bin Stats: Perform some statistics across the bars, such that the user knows the survival for each bin.
+	      	var per = [];
+	      	var per_opp = [];
+	      	var ran = [0,1,2,3,4,5,6];
+	        for (i in ran) {
+				per.push(data[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+	        for (i in ran) {
+				per_opp.push(dataStat[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+
+	        // Survived Percentages - used to label the bar chart.
+	        summed = 0;
+	        for (var key in data) { summed += (data[key].values['count']);};
+
+	       	//Setup Sizing, Scaling and Axes
+			var margin = {top: 20, right: 20, bottom: 30, left: 40},
+				  w = 400 - margin.left - margin.right,
+				  h = 170 - margin.top - margin.bottom,
+	      		  padd = 50,
+			      barHeight = 18;
+
+			var x = d3.scale.linear()
+			    .range([0, w-padd])
+			    .domain([0, d3.max(data, function(d) { return +d.values.count; })]);
+
+			var xAxis = d3.svg.axis()
+						      .scale(x)
+						      .orient("bottom")
+						      .tickValues(d3.range(0, 200, 50));;
+
+	        var chart2 = d3.select('#area2').append('svg')
+	                    .attr('width', w + margin.left + margin.right)
+	                    .attr('height', h + margin.top + margin.bottom)
+
+	        //Setup Bar Chart
+		    var bars = chart2.selectAll("g")
+		        .data(data)
+		      .enter().append("g")
+		        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; })
+		        .attr('class','barSurvived');
+
+		    bars.append("rect")
+		        .attr("width", function(d) { return x(+d.values.count); })
+		        .attr("height", barHeight - 1)
+
+		    chart2.append("g")
+		    	.attr("class","x axis")
+		    	.attr("transform", "translate(3," + (170 - 40) + ")")
+		    	.call(xAxis)
+
+		    bars.append("text")
+		        // .attr("x", function(d) { return x(+d.values.count) - 3; })
+		        .attr("x", function(d) { return x(+d.values.count) + 3;})
+		        .attr("y", barHeight / 2)
+		        .attr("dy", ".35em")
+		        // .text(function(d,i) { return d.key.toUpperCase() + " (" + d3.round((d.values.count/summed * 100),2) + '%)'; });
+		        .text(function(d,i) { return d.key.toUpperCase() + " (" + d3.round((per[i] * 100),1) + '%)'; });
+
+	        // Add Caption for the Chart
+      		chart2.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", 170 - 3 )
+              .style("text-anchor", "middle")
+              .text("Passengers who Survived - Binned by Age");
+
+	      };
+
+	      function barDrawDied(data) {
+
+	      	//Data for Bin Stats ONLY
+	      	var dataStat = getBarDataAge(data.filter(function(d) {
+          			if (d['survived'] == '1') {
+            		return d;
+          			};
+          		}));
+
+	      	//Data for Bar Charts (Main)
+	      	data = data.filter(function(d) {
+          			if (d['survived'] == '0') {
+            		return d;
+          			};
+          		});
+	      	data = getBarDataAge(data);
+
+	      	//Bin Stats: Perform some statistics across the bars, such that the user knows the survival for each bin.
+	      	var per = [];
+	      	var per_opp = [];
+	      	var ran = [0,1,2,3,4,5,6];
+	        for (i in ran) {
+				per.push(data[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+	        for (i in ran) {
+				per_opp.push(dataStat[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+
+	        // Survived Percentages - used to label the bar chart.
+	        summed = 0;
+	        for (var key in data) { summed += (data[key].values['count']);};
+
+	       	//Setup Sizing, Scaling and Axes
+			var margin = {top: 20, right: 20, bottom: 30, left: 40},
+				  w = 400 - margin.left - margin.right,
+				  h = 170 - margin.top - margin.bottom,
+	      		  padd = 50,
+			      barHeight = 18;
+
+			var x = d3.scale.linear()
+			    .range([0, w-padd])
+			    .domain([0, d3.max(data, function(d) { return +d.values.count; })]);
+
+			var xAxis = d3.svg.axis()
+						      .scale(x)
+						      .orient("bottom")
+						      .tickValues(d3.range(0, 250, 75));
+
+	        var chart2 = d3.select('#area2').append('svg')
+	                    .attr('width', w + margin.left + margin.right)
+	                    .attr('height', h + margin.top + margin.bottom)
+
+	        //Setup Bar Chart
+		    var bars = chart2.selectAll("g")
+		        .data(data)
+		      .enter().append("g")
+		        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; })
+		        .attr('class','barDied');
+
+		    bars.append("rect")
+		        .attr("width", function(d) { return x(+d.values.count); })
+		        .attr("height", barHeight - 1);
+
+		    chart2.append("g")
+		    	.attr("class","x axis")
+		    	.attr("transform", "translate(3," + (170 - 40) + ")")
+		    	.call(xAxis)
+
+		    bars.append("text")
+		        // .attr("x", function(d) { return x(+d.values.count) - 3; })
+		        .attr("x", function(d) { return x(+d.values.count) + 3;})
+		        .attr("y", barHeight / 2)
+		        .attr("dy", ".35em")
+		        .text(function(d,i) { return d.key.toUpperCase() + " (" + d3.round((per[i] * 100),1) + '%)'; });
+
+	        // Add Caption for the Chart
+      		chart2.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", 170 - 3 )
+              .style("text-anchor", "middle")
+              .text("Passengers who Died - Binned by Age");
+
+	      };
+
+	      function tilesDraw(data,num) {
+
+	      	data = data.filter(function(d) {
+          			if (d['pclass'] == num) {
+            		return d;
+          			};
+          		});
+
+	        var w = 260,
+	      		h = 220,
+	      		padd = 20;
+
+	      	//Title Check
+	      	if(num == 1) {var class_title =  '1st Class';} else if (num == 2) {var class_title =  '2nd Class';} else {var class_title =  '3rd Class';}
+
+	        //Update Survived Percentages
+	        var total = data.length;
+	        var surv_tile = 0;
+	        for (var key in data) { surv_tile += (+data[key].survived)}
+	        var died_tile = total - surv_tile;
+
+	      	// Sizing for the grid visualization
+			squareSize = 6;
+			squarePad = 2;
+			numPerRow = (w - padd) / (squareSize + squarePad);
+
+			var tData = parseTileData(data);
+			// Sort the Data by survived status
+			// tData = tData.sort(function(a, b){return (+a.survived) - (+b.survived)});
+
+			var chart3 = d3.select('#area4').append('svg')
+	                    .attr('width', w)
+	                    .attr('height', h)
+
+		    var squares = chart3.selectAll("g")
+		    		.data(tData);
+		    	  // .data(tData.sort(function(a,b) { return  +b['survived'] - +a['survived'];}));
+
+		    squares.enter()
+			      .append("rect")
+			      .attr("width", squareSize)
+			      .attr("height", squareSize)
+			      .attr("fill", function(d) {if (d.survived == '1') {return 'lightblue';} else {return 'pink';}})
+			      .classed("square", true)
+			      // .classed("fill-square", function(d) { return d.filler; })
+			      .attr("x", function(d) { return d.x;})
+			      .attr("y", function(d) { return d.y + padd;})
+			      .attr("opacity", 1);
+
+	        // Add Caption for the Chart
+      		chart3.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", padd - 5 )
+              .style("text-anchor", "middle")
+              .text(class_title + " Survival - " + d3.round((surv_tile / total * 100),1) + "%");
+
+	        //TOOLTIP - using pageX and pageY to position without having to use SVG coordinates (which complicates matters for items near the SVG edges.)
+	        squares.on("mouseover", function(d) {
+	            div.transition()    
+	               .duration(300)   
+	               .style("opacity", .9);   
+	            div.html(
+	              "<font size='4'>"+d.survived_formal+"</font>" + '<br/>' + 
+	              '<strong/>' + 'Name: ' + '</strong>' + d.name + '<br/>' + 
+	              '<strong/>' + 'Sex: ' + '</strong>' + toTitleCase(d.sex) + '<br/>' + 
+	              '<strong/>' + 'Age: ' + '</strong>' + d.age + '<br/>' + 
+	              '<strong/>' + 'Fare: ' + '</strong>' + d3.round(d.fare) + '<br/>' + 
+	              '<strong/>' + 'Cabin Class: ' + '</strong>' + d.class_formal)
+	               .style("left", (d3.event.pageX + 8) + "px")    
+	               .style("top", (d3.event.pageY + 8) + "px");  
+	            })
+	              .on("mouseout", function() {
+	                div.transition()
+	                   .duration(300)
+	                   .style('opacity',0);
+	            })
+
+	      };
+
+	      function barDrawFareSurvived(data) {
+
+	      	//Data for Bin Stats
+	      	var dataStat = getBarDataFare(data.filter(function(d) {
+          			if (d['survived'] == '0') {
+            		return d;
+          			};
+          		}));
+
+	      	//Data for Bar Charts
+	      	data = data.filter(function(d) {
+          			if (d['survived'] == '1') {
+            		return d;
+          			};
+          		});
+	      	data = getBarDataFare(data);
+
+	      	//Bin Stats: Perform some statistics across the bars, such that the user knows the survival for each bin.
+	      	var per = [];
+	      	var per_opp = [];
+	      	var ran = [0,1,2,3,4,5];
+	        for (i in ran) {
+				per.push(data[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+	        for (i in ran) {
+				per_opp.push(dataStat[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+
+	        // Survived Percentages - used to label the bar chart.
+	        summed = 0;
+	        for (var key in data) { summed += (data[key].values['count']);};
+
+	        //Setup Sizing, Scaling and Axes
+			var margin = {top: 20, right: 20, bottom: 30, left: 40},
+				  w = 400 - margin.left - margin.right,
+				  h = 170 - margin.top - margin.bottom,
+	      		  padd = 50,
+			      barHeight = 18;
+
+			var x = d3.scale.linear()
+			    .range([0, w-padd])
+			    .domain([0, d3.max(data, function(d) { return +d.values.count; })]);
+
+			var xAxis = d3.svg.axis()
+						      .scale(x)
+						      .orient("bottom")
+						      .tickValues(d3.range(0, 500, 100));
+
+	        var chart2 = d3.select('#area3').append('svg')
+	                    .attr('width', w + margin.left + margin.right)
+	                    .attr('height', h + margin.top + margin.bottom)
+
+	        //Setup Bar Chart
+		    var bars = chart2.selectAll("g")
+		        .data(data)
+		      .enter().append("g")
+		        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; })
+		        .attr('class','barSurvived');
+
+		    bars.append("rect")
+		        .attr("width", function(d) { return x(+d.values.count); })
+		        .attr("height", barHeight - 1);
+
+		    chart2.append("g")
+		    	.attr("class","x axis")
+		    	.attr("transform", "translate(3," + (170 - 60) + ")")
+		    	.call(xAxis);
+
+		    bars.append("text")
+		        // .attr("x", function(d) { return x(+d.values.count) - 3; })
+		        .attr("x", function(d) { return x(+d.values.count) + 3;})
+		        .attr("y", barHeight / 2)
+		        .attr("dy", ".35em")
+		        .text(function(d,i) { return d.key.substring(2) + " (" + d3.round((per[i] * 100),1) + '%)'; });
+
+	        // Add Caption for the Chart
+      		chart2.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", 170 - 23  )
+              .style("text-anchor", "middle")
+              .text("Passengers who Survived - Binned by Fare");
+
+	      };
+
+	      function barDrawFareDied(data) {
+
+	      	//Data for Bin Stats
+	      	var dataStat = getBarDataFare(data.filter(function(d) {
+          			if (d['survived'] == '1') {
+            		return d;
+          			};
+          		}));
+
+	      	//Data for Bar Charts
+	      	data = data.filter(function(d) {
+          			if (d['survived'] == '0') {
+            		return d;
+          			};
+          		});
+	      	data = getBarDataFare(data);
+
+	      	//Bin Stats: Perform some statistics across the bars, such that the user knows the survival for each bin.
+	      	var per = [];
+	      	var per_opp = [];
+	      	var ran = [0,1,2,3,4,5];
+	        for (i in ran) {
+				per.push(data[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+	        for (i in ran) {
+				per_opp.push(dataStat[i].values['count'] / (data[i].values['count'] + dataStat[i].values['count']));
+				}
+
+	        // Survived Percentages - used to label the bar chart.
+	        summed = 0;
+	        for (var key in data) { summed += (data[key].values['count']);};
+
+	        //Setup Sizing, Scaling and Axes
+			var margin = {top: 20, right: 20, bottom: 30, left: 40},
+				  w = 400 - margin.left - margin.right,
+				  h = 170 - margin.top - margin.bottom,
+	      		  padd = 50,
+			      barHeight = 18;
+
+			var x = d3.scale.linear()
+			    .range([0, w-padd])
+			    .domain([0, d3.max(data, function(d) { return +d.values.count; })]);
+
+			var xAxis = d3.svg.axis()
+						      .scale(x)
+						      .orient("bottom")
+						      .tickValues(d3.range(0, 800, 200));
+
+	        var chart2 = d3.select('#area3').append('svg')
+	                    .attr('width', w + margin.left + margin.right)
+	                    .attr('height', h + margin.top + margin.bottom)
+
+	        //Setup Bar Chart
+		    var bars = chart2.selectAll("g")
+		        .data(data)
+		      .enter().append("g")
+		        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; })
+		        .attr('class','barDied');
+
+		    bars.append("rect")
+		        .attr("width", function(d) { return x(+d.values.count); })
+		        .attr("height", barHeight - 1);
+
+		    chart2.append("g")
+		    	.attr("class","x axis")
+		    	.attr("transform", "translate(3," + (170 - 60) + ")")
+		    	.call(xAxis);
+
+		    bars.append("text")
+		        // .attr("x", function(d) { return x(+d.values.count) - 3; })
+		        .attr("x", function(d) { return x(+d.values.count) + 3;})
+		        .attr("y", barHeight / 2)
+		        .attr("dy", ".35em")
+		        .text(function(d,i) { return d.key.substring(2) + " (" + d3.round((per[i] * 100),1) + '%)'; });
+
+	        // Add Caption for the Chart
+      		chart2.append("text")     
+              .attr("x", (w / 2) - 5 )
+              .attr("y", 170 - 23  )
+              .style("text-anchor", "middle")
+              .text("Passengers who Died - Binned by Fare");
+
+	      };
+
+
+	    pieDraw_All(all_data);  	// Initiate the pie drawing - ALL
+	    pieDraw_Male(all_data);  	// Initiate the pie drawing - MALE
+	    pieDraw_Female(all_data);  	// Initiate the pie drawing - FEMALE
+
+	    barDrawSurvived(all_data); 	// Initiate the Bar - Survived (AGE)
+	    barDrawDied(all_data); 		// Initiate the Bar - Died (AGE)
+
+	    tilesDraw(all_data,3); 		//Draw THIRD Class (Ordered for Impact on user - 3rd class to 1st - shows the disparity)
+	    tilesDraw(all_data,2); 		//Draw SECOND Class
+	    tilesDraw(all_data,1); 		//Draw FIRST Class
+
+	    barDrawFareSurvived(all_data); // Initiate the Bar - Survived (FARE)
+	    barDrawFareDied(all_data);	   // Initiate the Bar - Died (FARE)
+		};
+
+	    // Other Helper Fuctions 
+
+	    // Make proper case from a string
+		function toTitleCase(str){
+		    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+		};
+
+	    function getPieData(data) {
+	        return  d3.nest()
+	                    .key(function(d) {return d.survived;})
+	                    .sortKeys(d3.ascending)
+	                    .rollup(function(d) {
+	                      return {
+	                        survived: d3.min(d,function(g) {return +g.survived;}),
+	                        count: d.length
+	                      };
+	                      })
+	                    .entries(data)
+	    };
+
+	    // Data Fuctions 
+
+	    function getBarDataAge(data) {
+	        return  d3.nest()
+	                    .key(function(d) {return d.age_bin;})
+	                    .sortKeys(d3.ascending)
+	                    .rollup(function(d) {
+	                      return {
+	                        age_bin: d3.min(d,function(g) {return g.age_bin;}),
+	                        count: d.length
+	                      };
+	                      })
+	                    .entries(data)
+	    };
+
+	    function getBarDataFare(data) {
+	        return  d3.nest()
+	                    .key(function(d) {return d.fare_bin;})
+	                    .sortKeys(d3.ascending)
+	                    .rollup(function(d) {
+	                      return {
+	                        age_bin: d3.min(d,function(g) {return g.fare_bin;}),
+	                        count: d.length
+	                      };
+	                      })
+	                    .entries(data)
+	    };
+
+	    function getAllData(data) {
+	      	var new_data1 = data.map(function(d) {
+	      		return {
+	      		  fare: +d.fare,
+		          age: d.age == '' ? NaN : +d.age,
+		          sibsp: +d.sibsp,
+		          pclass: +d.pclass,
+		          sex: d.sex,
+		          name: d.name,
+		          survived: d.survived,
+		          age_bin: d.age_bin,
+		          survived_formal: d.survived_formal,
+		          class_formal: d.class_formal,
+		          fare_bin: d.fare_bin
+		      };
+		  	});
+
+	      	return new_data1;
+	    };
+
+	    function parseTileData(rawdata) {
+	      	rawdata = rawdata.sort(function(a, b){return (+a.survived) - (+b.survived)});
+	      	var new_data2 = rawdata.map(function(d,i) { 
+	      		d.col = i % numPerRow;
+	      		d.x = d.col * (squareSize + squarePad);
+	      		d.row = Math.floor(i / numPerRow);
+	      		d.y = d.row * (squareSize + squarePad);
+	      		return d;
+	      	});
+
+	      	return new_data2;
+	    };
+
+	    function display(data) {
+	        all_data = getAllData(data); //Setup the data appropriately
+
+	        viz(all_data); // Visualize different charts
+	    };
+
+	    // Load Data and Jump into First Function
+	    d3.csv("titanic_full.csv",display);
+						
+		</script>
+	</body>
+</html>

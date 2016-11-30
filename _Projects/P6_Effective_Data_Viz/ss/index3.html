@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+		<meta charset='utf-8'>
+		<title>D3: Andy Testing</title>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<style type="text/css">
+			.axis path,
+			.axis line {
+				fill: none;
+				stroke: black;
+				shape-rendering: crispEdges;
+			}
+			
+			.axis text {
+				font-family: sans-serif;
+				font-size: 8px;
+			}
+			div.type_buttons {
+		        position: fixed;
+		        top: 5px;
+		        left: 650px;
+		      }
+		    div.type_buttons div {
+		        background-color: rgb(251, 201, 127);
+        		padding: 3px;
+        		margin: 7px;
+    		}
+	        
+		</style>
+	</head>
+	<body>
+
+<!-- 		<p>Click Here</p>
+		Female<input type="radio" name="Status" id="radio-female" value="Female" />
+    	Male<input type="radio" name="Status" id="radio-closed" value="Closed" onClick="update('male');"/>
+    	Children<input type="radio" name="Status" id="radio-clear" value="Clear" onClick="update('children');"/> -->
+    	<!-- <div id="option">
+    		<input name="updateButton" 
+	           type="button" 
+	           value="Female Only" 
+	           onclick="update('female')" />
+		</div> -->
+
+		<script type='text/javascript'>
+			//Data Visualization
+			function generateViz(dataset) {
+				//Filter out any values with no age
+				var dataset = dataset.filter(function(d) {if (d['age'] >= 0) {return d;}});
+
+				//Width and height
+				var w = 650;
+				var h = 650;
+				var padding = 20;
+
+				//Create scale functions
+				var xScale = d3.scale.linear()
+									 .domain([0, d3.max(dataset, function(d) { return d.fare; })])
+									 .range([padding, w - padding * 2]); // introduced this to make sure values are not cut off
+
+				var yScale = d3.scale.linear()
+									 .domain([0, d3.max(dataset, function(d) { return d.age; })])
+									 .range([h - padding, padding]);
+
+				var xAxis = d3.svg.axis()
+								  .scale(xScale)
+								  .orient("bottom");
+
+				var yAxis = d3.svg.axis()
+								  .scale(yScale)
+								  .orient("left");
+
+				//Create SVG element
+				var svg = d3.select("body")
+							.append("svg")
+							.attr("width", w)
+							.attr("height", h);
+
+				//Create and Show Circles
+				svg.selectAll('circle')
+				   .data(dataset)
+				   .enter()
+				   .append('circle')
+				   .attr("cx", function(d) { return xScale(d.fare); })
+				   .attr("cy", function(d) { return yScale(d.age); })
+				   .attr("r", 3)
+				   .attr('fill', function(d) {
+				   	if (d.survived === '0') { return 'green'; } else { return 'red'; }
+				   	});
+
+				//Create and Show Labels 
+			    // svg.selectAll('text')
+			    //    .data(dataset)
+			    //    .enter()
+			    //    .append('text')
+			    //    //.text(function(d) {return Math.round(d.fare);})
+			    //    .attr('x',function(d) { return xScale(d.fare); })
+			    //    .attr('y',function(d) { return yScale(d.age); })
+			    //    .attr("font-family", "sans-serif")
+			   	//    .attr("font-size", "8px")
+			   	//    .attr("fill", "black");
+			   	
+			   	//Show Axes
+			   	svg.append('g')
+			   	   .attr('class','x axis')
+			   	   .attr('transform','translate(0,' + (h - padding)+')')
+			   	   .call(xAxis);
+
+		   	   	svg.append('g')
+			   	   .attr('class','y axis')
+			   	   .attr('transform','translate(' + padding + ',0)')
+			   	   .call(yAxis);
+
+			   	// function updateData(sex) {
+			   	// 	d3.csv('titanic_full.csv', function(csv) {
+			   	// 		filtered = csv.filter(function(row) {
+			   	// 			return row['sex'] == sex;
+			   	// 		})
+			   	// 	},updateSex());
+			   	// };
+			   	function updateSex(sex) {
+			   		//Filter on the data necessary
+			   		if (sex == 'Female Only') {var filteredData = dataset.filter(function(d) {
+			   			if (d['sex'] == 'female') {return d;}})} 
+		   			else if (sex == 'Male Only') {var filteredData = dataset.filter(function(d) {
+			   			if (d['sex'] == 'male') {return d;}})} 
+		   			else if (sex == 'Children Only') {var filteredData = dataset.filter(function(d) {
+			   			if (d['age'] <= 13 ) {return d;}})} 
+		   			else if (sex == 'All') {var filteredData = dataset.filter(function(d) {
+			   			return d;})};
+
+			  		//Update Scale domain
+			  		xScale.domain([0, d3.max(filteredData, function(d) { return d.fare; })])
+			  		yScale.domain([0, d3.max(filteredData, function(d) { return d.age; })])
+
+					//Update all Circles
+					var circles = svg.selectAll('circle')
+									 .data(filteredData, function(d) {return d.name;})
+
+					circles.exit().remove();
+
+					circles.enter()
+					       .append('circle')
+						   .transition()
+						   .duration(1000)
+						   .attr("cx", function(d) { return xScale(d.fare); })
+						   .attr("cy", function(d) { return yScale(d.age); })
+						   .attr("r", 6)
+						   .attr('fill', function(d) {
+						   	if (d.survived === '0') { return 'green'; } else { return 'red'; }
+						   	})
+
+				   	// svg.selectAll('text')
+				   	//    .data(filteredData)
+				   	//    .text(function(d) {
+				   	//    	return '';
+				   	//    })
+				   	//    .attr('x',function(d) { return xScale(d.fare); }) 
+				    //    .attr('y',function(d) { return yScale(d.age); })
+				    //    .attr("font-family", "sans-serif")
+				   	//    .attr("font-size", "8px")
+				   	//    .attr("fill", "black");
+
+			   	   //Update X axis
+					svg.select(".x.axis")
+				    	.transition()
+				    	.duration(1000)
+						.call(xAxis);
+					
+					//Update Y axis
+					svg.select(".y.axis")
+				    	.transition()
+				    	.duration(1000)
+						.call(yAxis);
+					};
+
+
+				// d3.select('#radio-female')
+				//   .on('click', update(female))
+				//   .;
+
+				//document.getElementById('radio-female').addEventListener("click", update('female'));	
+				//On Click, update with New Data
+				//d3.select('#radio-female')
+				  //.on('click', update('female'));
+
+				//Adding Interactive Elements
+				//Create listing of items the user may select
+				var options = ['Female Only','Male Only','Children Only','All']
+
+				var buttons = d3.select('body')
+		            .append('div')
+		            .attr('class','type_buttons')
+		            .selectAll('div')
+		            .data(options)
+		            .enter()
+		            .append('div')
+		            .text(function(d) {return d;});
+
+	            //Event Handler
+	            buttons.on('click',function(d) {
+	            	d3.select(".type_buttons")
+	            	  .selectAll('div') //Returns 4 buttons
+	            	  .transition()
+	            	  .duration(1000)
+	            	  .style('color','black') //set initial stylings before clicked
+	            	  .style('background','rgb(251,201,127)');
+
+	        	    d3.select(this) //Accessing what was clicked
+	        	      .transition()
+	        	      .duration(500)
+	        	      .style("background", "lightBlue") // asthetics when clicked
+	                  .style("color","white");
+
+	                console.log(d);
+	                
+	              	updateSex(d);
+	            });
+	        };
+
+			//Data Loading
+			d3.csv('titanic_full.csv', function(d) {
+				d['fare'] = +d['fare'];
+				if (d['age'] == '') {d['age'] = NaN} else {d['age'] = +d['age']};
+				//d['age'] = +d['age'];
+				d['sibsp'] = +d['sibsp'];
+				d['pclass'] = +d['pclass'];
+				return d; 
+			}, generateViz);
+			
+		</script>
+	</body>
+</html>
